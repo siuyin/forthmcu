@@ -21,6 +21,10 @@
   3 RCC RC_CFGR0 + bic!
   2 RCC RC_CFGR0 + bis!
 ;
+: xs ( -- ) \ select external osc as the system clock
+  3 RCC RC_CFGR0 + bic!
+  1 RCC RC_CFGR0 + bis!
+;
 : hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
 : es ( -- ) ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
@@ -36,3 +40,6 @@
 : 72i $271 15 ni ;
 : 72e $271 1 nx ;
 : 96e $341 2 nx ;
+
+: hsi hs $45 er pd 5bl ;
+: hse ee xs $d0 er pd 5bl ;
