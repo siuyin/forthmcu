@@ -1,6 +1,10 @@
 \ ch32v2x.efr provides constants for CH32V2 family MCUs.
 \ eg. CH32V203C8T6
 
-$40021018 equ RCC_APB2PCENR
-$40010804 equ GPIOA_CFGHR
-$40010810 equ GPIOA_BSRH
+$40021000 equ RCC
+$18 equ RC_APB2PCENR
+
+$40010800 equ GPIOA
+$00 equ GP_CFGLR
+$04 equ GP_CFGHR
+$10 equ GP_BSRH

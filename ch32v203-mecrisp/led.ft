@@ -2,21 +2,22 @@
 \ The routines are written in forth.
 
 \res MCU: ch32v2x
-\res export RCC_APB2PCENR GPIOA_CFGHR GPIOA_BSRH
+\res export RCC GPIOA RC_APB2PCENR GP_CFGHR GP_BSRH
 
-: rcc.led.en ( -- ) 1 2 lshift RCC_APB2PCENR bis!
-  %1111 %1111 12 lshift or GPIOA_CFGHR bic! 
-  %0010 %0010 12 lshift or GPIOA_CFGHR bis! \ enable output, push-pull, 2MHz in gpio a cfg h r
+: rcc.led.en ( -- ) 1 2 lshift RCC RC_APB2PCENR + bis!
+  %1111 %1111 12 lshift or GPIOA GP_CFGHR + bic! 
+  %0010 %0010 12 lshift or GPIOA GP_CFGHR + bis! \ enable output, push-pull, 2MHz in gpio a cfg h r
 ;
-: led1.on ( -- ) 1 8 lshift GPIOA_BSRH bis! \ gpio a b s h r
+: led1.on ( -- ) 1 8 lshift GPIOA GP_BSRH + bis! 
 ;
-: led1.off ( -- ) 1 24 lshift GPIOA_BSRH bis!
+: led1.off ( -- ) 1 24 lshift GPIOA GP_BSRH + bis!
 ;
-: led2.on ( -- ) 1 11 lshift GPIOA_BSRH bis! \ gpio a b s h r
+: led2.on ( -- ) 1 11 lshift GPIOA GP_BSRH + bis! \ gpio a b s h r
 ;
-: led2.off ( -- ) 1 27 lshift GPIOA_BSRH bis!
+: led2.off ( -- ) 1 27 lshift GPIOA GP_BSRH + bis!
 ;
 
+\ Toggle line buffering with \^ on eth4com.
 : led.kb
   rcc.led.en
   begin
@@ -28,5 +29,7 @@
     $30 =
   until
 ;
+
 : dly ( u -- ) 0 do loop ; \ busy wait u times
+
 : 5bl ( -- ) rcc.led.en 5 0 do led1.on 1000000 dly led1.off  1000000 dly loop ;
