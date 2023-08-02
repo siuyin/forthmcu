@@ -2,6 +2,7 @@
 \ eg. CH32V203C8T6
 
 $40021000 equ RCC
+$04 equ RC_CFGR0
 $18 equ RC_APB2PCENR
 
 $40010800 equ GPIOA
@@ -13,3 +14,4 @@ $40013800 constant USART1
 $08 constant U_BRR
 $0c constant U_CTLR1
 $10 constant U_CTLR2
+

@@ -3,26 +3,26 @@
 #require br.ft
 #require led.ft
 
-$40021000 constant cl
-$4 constant c0
+\res MCU: ch32v2x
+\res export RCC RC_CFGR0
 
-: ee ( -- ) 1 16 lshift cl bis! ; \ hse on
-: pe ( -- ) 1 24 lshift cl bis! ; \ pll on
-: pd ( -- ) 1 24 lshift cl bic! ; \ pll off
-: st ( -- u ) cl @ ;
-: cf ( -- u ) cl c0 + @ ; \ configuration 0
+: ee ( -- ) 1 16 lshift RCC bis! ; \ hse on
+: pe ( -- ) 1 24 lshift RCC bis! ; \ pll on
+: pd ( -- ) 1 24 lshift RCC bic! ; \ pll off
+: st ( -- u ) RCC @ ;
+: cf ( -- u ) RCC RC_CFGR0 + @ ; \ configuration 0
 
 
 : mul ( u -- ) \ set pll multiplier
-  $f 18 lshift cl c0 + bic!
-  18 lshift cl c0 + bis!
+  $f 18 lshift RCC RC_CFGR0 + bic!
+  18 lshift RCC RC_CFGR0 + bis!
 ;
 : ps ( -- ) \ select pll as the system clock
-  3 cl c0 + bic!
-  2 cl c0 + bis!
+  3 RCC RC_CFGR0 + bic!
+  2 RCC RC_CFGR0 + bis!
 ;
-: hs ( -- ) 3 cl c0 + bic! ; \ select hsi as the system clock
-: es ( -- ) ee 1 16 lshift cl c0 + bis! ; \ select hse to drive PLL
+: hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
+: es ( -- ) ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
 : nx ( u -- ) pd es mul pe ps \ mul x HSE
   er
