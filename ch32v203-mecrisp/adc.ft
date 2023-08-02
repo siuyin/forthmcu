@@ -1,0 +1,75 @@
+\res MCU: ch32v2x
+\res export RCC RC_APB2PCENR ADC1 AD_CTLR2 AD_RSQR1 AD_RSQR2 AD_RSQR3
+\res export AD_SAMPTR1 AD_SAMPTR2 AD_STATR AD_RDATAR RC_APB2PRSTR
+
+\ ADC clock shall not exceed 14MHz.
+: adc.pre ( u -- ) $f 14 lshift RCC RC_CFGR0 + bic!
+  14 lshift RCC RC_CFGR0 + bis!
+; \ adc prescaler 00: PCLK2 divided by 2, 11: PCLK2 divided by 8.
+: ad1.en ( -- )
+  0 adc.pre \ adc1 /2 prescaler
+  1 9 lshift RCC RC_APB2PCENR + bis! \ enable clock to adc1
+  1 9 lshift RCC RC_APB2PRSTR + bis! \ reset adc1
+  1 9 lshift RCC RC_APB2PRSTR + bic! \ reset adc1
+;
+: ad1.de ( -- ) 1 9 lshift RCC RC_APB2PCENR + bic! ;
+: ad1.on ( -- ) 1 ADC1 AD_CTLR2 + bis! ;
+: ad1.off ( -- ) 1 ADC1 AD_CTLR2 + bic! ;
+: ad1.tson ( -- ) 1 23 lshift ADC1 AD_CTLR2 + bis! ;
+: ad1.tsoff ( -- ) 1 23 lshift ADC1 AD_CTLR2 + bic! ;
+: ad1.etrg ( -- )
+  1 20 lshift ADC1 AD_CTLR2 + bis!
+  7 17 lshift ADC1 AD_CTLR2 + bis!
+;
+
+: ad1.cal ( -- )
+  1000 0 do nop loop
+  1 3 lshift ADC1 AD_CTLR2 + bis! \ reset cal
+  1 2 lshift ADC1 AD_CTLR2 + bis!
+  begin ADC1 AD_CTLR2 + @ 1 2 lshift and 0= until
+;
+
+: ad1.n ( u -- ) \ number of conversions
+  20 lshift ADC1 AD_RSQR1 + bis!
+;
+
+\ configure adc channel to sequence number.
+\ Eg. 16 1 ad1.ch sets temperature sensor to conversion sequence 1. 
+: ad1.ch ( ch seq# -- ) 
+  dup 7 < if
+    dup $1ff 1- 5 * lshift ADC1 AD_RSQR3 + bic!
+     1- 5 * lshift ADC1 AD_RSQR3 + bis!
+  else
+  dup 13 < if
+    dup $1ff 1- 5 * lshift ADC1 AD_RSQR2 + bic!
+    1- 5 * lshift ADC1 AD_RSQR2 + bis!
+  else
+  dup 17 < if
+    dup $1ff 1- 5 * lshift ADC1 AD_RSQR1 + bic!
+    1- 5 * lshift ADC1 AD_RSQR1 + bis!
+  then then then
+;
+
+: ad1.t ( t ch -- ) \ set sample time, t, for adc chan, ch
+  dup 10 < if
+    dup $7 3 * lshift ADC1 AD_SAMPTR2 + bic!
+    3 * lshift ADC1 AD_SAMPTR2 + bis!
+  else
+    dup 10 - $7 3 * lshift ADC1 AD_SAMPTR1 + bic!
+    10 - 3 * lshift ADC1 AD_SAMPTR1 + bis!
+  then
+;
+
+: ad1.la ( -- ) 1 11 lshift ADC1 AD_CTLR2 bis! ; \ conversion result left aligned
+: ad1.ra ( -- ) 1 11 lshift ADC1 AD_CTLR2 bic! ; \ conversion result right aligned
+
+: ad1.st
+  1 22 lshift ADC1 AD_CTLR2 + bis! \ start conversion
+  begin 1 1 lshift ADC1 AD_STATR + bit@ until
+  ADC1 AD_RDATAR + @ hex. 
+;
+: ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
+  4 16 ad1.t 4 17 ad1.t
+  1 ad1.n ad1.ra
+  16 1 ad1.ch 
+;

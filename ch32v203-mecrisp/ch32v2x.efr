@@ -3,6 +3,7 @@
 
 $40021000 equ RCC
 $04 equ RC_CFGR0
+$0c equ RC_APB2PRSTR
 $18 equ RC_APB2PCENR
 
 $40010800 equ GPIOA
@@ -17,4 +18,11 @@ $10 equ U_CTLR2
 
 $40012400 equ ADC1
 $0 equ AD_STATR
+$04 equ AD_CTLR1
 $08 equ AD_CTLR2
+$0c equ AD_SAMPTR1
+$10 equ AD_SAMPTR2
+$2c equ AD_RSQR1
+$30 equ AD_RSQR2
+$34 equ AD_RSQR3
+$4c equ AD_RDATAR
