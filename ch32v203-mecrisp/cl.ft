@@ -32,11 +32,12 @@
   er
   5bl
 ;
-: ni ( u -- ) pd mul pe ps \ mul x HSI/2
+: ni ( u -- ) pd hs mul pe ps \ mul x HSI/2
   er
   5bl
 ;
 
+: 24i $d0 4 ni ;
 : 72i $271 15 ni ;
 : 72e $271 1 nx ;
 : 96e $341 2 nx ;

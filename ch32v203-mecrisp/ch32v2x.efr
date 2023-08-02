@@ -10,8 +10,11 @@ $00 equ GP_CFGLR
 $04 equ GP_CFGHR
 $10 equ GP_BSRH
 
-$40013800 constant USART1
-$08 constant U_BRR
-$0c constant U_CTLR1
-$10 constant U_CTLR2
+$40013800 equ USART1
+$08 equ U_BRR
+$0c equ U_CTLR1
+$10 equ U_CTLR2
 
+$40012400 equ ADC1
+$0 equ AD_STATR
+$08 equ AD_CTLR2
