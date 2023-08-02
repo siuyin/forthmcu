@@ -1,0 +1,38 @@
+\ cl.ft clock routines
+
+#require br.ft
+#require led.ft
+
+$40021000 constant cl
+$4 constant c0
+
+: ee ( -- ) 1 16 lshift cl bis! ; \ hse on
+: pe ( -- ) 1 24 lshift cl bis! ; \ pll on
+: pd ( -- ) 1 24 lshift cl bic! ; \ pll off
+: st ( -- u ) cl @ ;
+: cf ( -- u ) cl c0 + @ ; \ configuration 0
+
+
+: mul ( u -- ) \ set pll multiplier
+  $f 18 lshift cl c0 + bic!
+  18 lshift cl c0 + bis!
+;
+: ps ( -- ) \ select pll as the system clock
+  3 cl c0 + bic!
+  2 cl c0 + bis!
+;
+: hs ( -- ) 3 cl c0 + bic! ; \ select hsi as the system clock
+: es ( -- ) ee 1 16 lshift cl c0 + bis! ; \ select hse to drive PLL
+
+: nx ( u -- ) pd es mul pe ps \ mul x HSE
+  er
+  5bl
+;
+: ni ( u -- ) pd mul pe ps \ mul x HSI/2
+  er
+  5bl
+;
+
+: 72i $271 15 ni ;
+: 72e $271 1 nx ;
+: 96e $341 2 nx ;

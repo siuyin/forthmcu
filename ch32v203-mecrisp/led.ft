@@ -1,0 +1,32 @@
+\ led.ft controls LEDS on my CH32V203 board.
+\ The routines are written in forth.
+
+\res MCU: ch32v2x
+\res export RCC_APB2PCENR GPIOA_CFGHR GPIOA_BSRH
+
+: rcc.led.en ( -- ) 1 2 lshift RCC_APB2PCENR bis!
+  %1111 %1111 12 lshift or GPIOA_CFGHR bic! 
+  %0010 %0010 12 lshift or GPIOA_CFGHR bis! \ enable output, push-pull, 2MHz in gpio a cfg h r
+;
+: led1.on ( -- ) 1 8 lshift GPIOA_BSRH bis! \ gpio a b s h r
+;
+: led1.off ( -- ) 1 24 lshift GPIOA_BSRH bis!
+;
+: led2.on ( -- ) 1 11 lshift GPIOA_BSRH bis! \ gpio a b s h r
+;
+: led2.off ( -- ) 1 27 lshift GPIOA_BSRH bis!
+;
+
+: led.kb
+  rcc.led.en
+  begin
+    key dup
+    $31 = if led1.on then dup
+    $32 = if led1.off then dup
+    $33 = if led2.on then dup
+    $34 = if led2.off then dup
+    $30 =
+  until
+;
+: dly ( u -- ) 0 do loop ; \ busy wait u times
+: 5bl ( -- ) rcc.led.en 5 0 do led1.on 1000000 dly led1.off  1000000 dly loop ;

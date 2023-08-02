@@ -1,0 +1,22 @@
+$40010800 constant pa
+$4 constant ch
+: gp ( -- )
+  $ff 4 lshift $ff 8 lshift or ch pa + bic!
+  %1001 4 lshift \ pa9
+  %0100 8 lshift \ pa10
+  or ch pa + bis!
+;
+
+$40013800 constant u1
+$8 constant br
+$c constant c1
+$10 constant c2
+: s1 ( -- )
+  3 12 lshift u1 c2 + hbic! ; \ 1 stop bit
+
+: de ( -- ) 1 13 lshift u1 c1 + hbic! ; \ disable uart
+: en ( -- ) 1 13 lshift u1 c1 + hbis! ; \ enable uart
+
+: r ( u -- ) u1 br + hbis! ; \ set baud rate
+: er ( u -- ) de s1 r en ; \ enable new rate
+
