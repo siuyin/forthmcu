@@ -43,6 +43,7 @@
 ;
 : 16i $8b 2 rc.ni ;
 : 24i $d0 4 rc.ni ;
+: 48i $1a1 10 rc.ni ;
 : 72i $271 15 rc.ni ;
 : 72e $271 1 rc.nx ;
 : 96e $341 2 rc.nx ;
