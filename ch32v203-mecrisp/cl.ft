@@ -28,19 +28,21 @@
 : rc.hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
 : rc.es ( -- ) rc.ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
-: rc.nx ( u -- ) rc.pd rc.es rc.mul rc.pe rc.ps \ mul x HSE
-  u1.er
-  5bl
-;
-: rc.ni ( u -- ) rc.pd rc.hs rc.mul rc.pe rc.ps \ mul x HSI/2
-  u1.er
-  5bl
-;
 
+
+: hsi rc.hs $45 u1.er rc.pd ;
+: hse rc.ee rc.xs $d0 u1.er rc.pd ;
+
+: rc.nx ( u -- ) hsi hse rc.pd rc.es rc.mul rc.pe rc.ps \ mul x HSE
+  u1.er
+  5bl
+;
+: rc.ni ( u -- ) hsi rc.pd rc.hs rc.mul rc.pe rc.ps \ mul x HSI/2
+  u1.er
+  5bl
+;
+: 16i $8b 2 rc.ni ;
 : 24i $d0 4 rc.ni ;
 : 72i $271 15 rc.ni ;
 : 72e $271 1 rc.nx ;
 : 96e $341 2 rc.nx ;
-
-: hsi rc.hs $45 u1.er rc.pd 5bl ;
-: hse rc.ee rc.xs $d0 u1.er rc.pd 5bl ;
