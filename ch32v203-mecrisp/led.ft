@@ -32,4 +32,4 @@
 
 
 #require stk.ft
-: 5bl ( -- ) rcc.led.en 5 0 do led1.on 500 dly led1.off 500 dly loop ;
+: 5bl ( -- ) rcc.led.en st.en 5 0 do led1.on 500 dly led1.off 500 dly loop ;
