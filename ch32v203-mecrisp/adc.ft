@@ -64,12 +64,15 @@
 : ad1.ra ( -- ) 1 11 lshift ADC1 AD_CTLR2 bic! ; \ conversion result right aligned
 
 : ad1.st
-  1 22 lshift ADC1 AD_CTLR2 + bis! \ start conversion
+  \ 1 22 lshift ADC1 AD_CTLR2 + bis! \ start conversion
+  ad1.on
   begin 1 1 lshift ADC1 AD_STATR + bit@ until
-  ADC1 AD_RDATAR + @ hex. 
+  ADC1 AD_RDATAR + @ 
 ;
-: ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
+: ad1.ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
   4 16 ad1.t 4 17 ad1.t
   1 ad1.n ad1.ra
   16 1 ad1.ch 
 ;
+
+: ad1.tst 10 0 do ad1.st . loop ;
