@@ -8,12 +8,12 @@
 ;
 
 \res export USART1 U_BRR U_CTLR1 U_CTLR2
-: s1 ( -- )
+: u1.s1 ( -- )
   3 12 lshift USART1 U_CTLR2 + hbic! ; \ 1 stop bit
 
-: de ( -- ) 1 13 lshift USART1 U_CTLR1 + hbic! ; \ disable uart
-: en ( -- ) 1 13 lshift USART1 U_CTLR1 + hbis! ; \ enable uart
+: u1.de ( -- ) 1 13 lshift USART1 U_CTLR1 + hbic! ; \ disable uart
+: u1.en ( -- ) 1 13 lshift USART1 U_CTLR1 + hbis! ; \ enable uart
 
-: r ( u -- ) USART1 U_BRR + hbis! ; \ set baud rate
-: er ( u -- ) de s1 r en ; \ enable new rate
+: u1.r ( u -- ) USART1 U_BRR + hbis! ; \ set baud rate
+: u1.er ( u -- ) u1.de u1.s1 u1.r u1.en ; \ enable new rate
 

@@ -29,11 +29,11 @@
 : rc.es ( -- ) rc.ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
 : rc.nx ( u -- ) rc.pd rc.es rc.mul rc.pe rc.ps \ mul x HSE
-  er
+  u1.er
   5bl
 ;
 : rc.ni ( u -- ) rc.pd rc.hs rc.mul rc.pe rc.ps \ mul x HSI/2
-  er
+  u1.er
   5bl
 ;
 
@@ -42,5 +42,5 @@
 : 72e $271 1 rc.nx ;
 : 96e $341 2 rc.nx ;
 
-: hsi rc.hs $45 er rc.pd 5bl ;
-: hse rc.ee rc.xs $d0 er rc.pd 5bl ;
+: hsi rc.hs $45 u1.er rc.pd 5bl ;
+: hse rc.ee rc.xs $d0 u1.er rc.pd 5bl ;
