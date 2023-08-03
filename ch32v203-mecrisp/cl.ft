@@ -6,41 +6,41 @@
 \res MCU: ch32v2x
 \res export RCC RC_CFGR0
 
-: ee ( -- ) 1 16 lshift RCC bis! ; \ hse on
-: pe ( -- ) 1 24 lshift RCC bis! ; \ pll on
-: pd ( -- ) 1 24 lshift RCC bic! ; \ pll off
-: st ( -- u ) RCC @ ;
-: cf ( -- u ) RCC RC_CFGR0 + @ ; \ configuration 0
+: rc.ee ( -- ) 1 16 lshift RCC bis! ; \ hse on
+: rc.pe ( -- ) 1 24 lshift RCC bis! ; \ pll on
+: rc.pd ( -- ) 1 24 lshift RCC bic! ; \ pll off
+: rc.st ( -- u ) RCC @ ;
+: rc.cf ( -- u ) RCC RC_CFGR0 + @ ; \ configuration 0
 
 
-: mul ( u -- ) \ set pll multiplier
+: rc.mul ( u -- ) \ set pll multiplier
   $f 18 lshift RCC RC_CFGR0 + bic!
   18 lshift RCC RC_CFGR0 + bis!
 ;
-: ps ( -- ) \ select pll as the system clock
+: rc.ps ( -- ) \ select pll as the system clock
   3 RCC RC_CFGR0 + bic!
   2 RCC RC_CFGR0 + bis!
 ;
-: xs ( -- ) \ select external osc as the system clock
+: rc.xs ( -- ) \ select external osc as the system clock
   3 RCC RC_CFGR0 + bic!
   1 RCC RC_CFGR0 + bis!
 ;
-: hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
-: es ( -- ) ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
+: rc.hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
+: rc.es ( -- ) rc.ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
-: nx ( u -- ) pd es mul pe ps \ mul x HSE
+: rc.nx ( u -- ) rc.pd rc.es rc.mul rc.pe rc.ps \ mul x HSE
   er
   5bl
 ;
-: ni ( u -- ) pd hs mul pe ps \ mul x HSI/2
+: rc.ni ( u -- ) rc.pd rc.hs rc.mul rc.pe rc.ps \ mul x HSI/2
   er
   5bl
 ;
 
-: 24i $d0 4 ni ;
-: 72i $271 15 ni ;
-: 72e $271 1 nx ;
-: 96e $341 2 nx ;
+: 24i $d0 4 rc.ni ;
+: 72i $271 15 rc.ni ;
+: 72e $271 1 rc.nx ;
+: 96e $341 2 rc.nx ;
 
-: hsi hs $45 er pd 5bl ;
-: hse ee xs $d0 er pd 5bl ;
+: hsi rc.hs $45 er rc.pd 5bl ;
+: hse rc.ee rc.xs $d0 er rc.pd 5bl ;
