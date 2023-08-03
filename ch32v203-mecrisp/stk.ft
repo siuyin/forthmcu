@@ -1,0 +1,16 @@
+\ stk.ft systick
+
+\res MCU: ch32v2x
+\res export STK ST_CNTL
+
+: st.ms ( -- u ) 1000 ;
+: st.en ( -- ) 1 STK bis! ;
+: st.n ( -- u ) STK ST_CNTL + @ ;
+
+: dly ( u -- ) st.ms * st.n + >r
+  begin st.n r@ u>= until
+  r> drop
+;
+
+st.en
+

@@ -26,3 +26,11 @@ $2c equ AD_RSQR1
 $30 equ AD_RSQR2
 $34 equ AD_RSQR3
 $4c equ AD_RDATAR
+
+$E000F000 equ STK
+$0 equ ST_CTLR
+$04 equ ST_SR
+$08 equ ST_CNTL
+$0c equ ST_CNTH
+$10 equ ST_CMPLR
+$14 equ ST_CMPLH
