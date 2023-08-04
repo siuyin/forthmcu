@@ -3,7 +3,7 @@
 \res MCU: ch32v2x
 \res export STK ST_CNTL
 
-: st.ms ( -- u ) 1000 ;
+1000 constant st.ms
 : st.en ( -- ) 1 STK bis! ;
 : st.n ( -- u ) STK ST_CNTL + @ ;
 

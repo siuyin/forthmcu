@@ -7,7 +7,7 @@
   14 lshift RCC RC_CFGR0 + bis!
 ; \ adc prescaler 00: PCLK2 divided by 2, 11: PCLK2 divided by 8.
 : ad1.en ( -- )
-  0 adc.pre \ adc1 /2 prescaler
+  3 adc.pre \ adc1 /2 prescaler
   1 9 lshift RCC RC_APB2PCENR + bis! \ enable clock to adc1
   1 9 lshift RCC RC_APB2PRSTR + bis! \ reset adc1
   1 9 lshift RCC RC_APB2PRSTR + bic! \ reset adc1
@@ -21,6 +21,10 @@
   1 20 lshift ADC1 AD_CTLR2 + bis!
   7 17 lshift ADC1 AD_CTLR2 + bis!
 ;
+: ad1.dmaon ( -- ) 1 8 lshift ADC1 AD_CTLR2 + bis! ;
+: ad1.dmaoff ( -- ) 1 8 lshift ADC1 AD_CTLR2 + bic! ;
+: ad1.scon ( -- ) 1 8 lshift ADC1 AD_CTLR1 + bis! ;
+: ad1.scoff ( -- ) 1 8 lshift ADC1 AD_CTLR1 + bic! ;
 
 : ad1.cal ( -- )
   1000 0 do nop loop
@@ -71,8 +75,18 @@
 ;
 : ad1.ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
   4 16 ad1.t 4 17 ad1.t
-  1 ad1.n ad1.ra
-  16 1 ad1.ch 
+  1 ad1.n ad1.ra ad1.scoff
+  16 1 ad1.ch 17 2 ad1.ch
 ;
-
 : ad1.tst 10 0 do ad1.st . loop ;
+
+#require dma.ft
+: ad1.dma ( addr -- ) \ addr is 4 buffer: name 
+  ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
+  4 16 ad1.t 4 17 ad1.t
+  2 ad1.n ad1.ra ad1.dmaon ad1.scon
+  16 1 ad1.ch 17 2 ad1.ch
+
+  
+
+;

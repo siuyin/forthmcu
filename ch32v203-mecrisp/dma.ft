@@ -1,0 +1,45 @@
+\ dma setup for ADC1 on DMA channel 1
+\res MCU: ch32v2x
+\res export DMA1 D_CFGRx D_CNTRx D_PADDRx D_MADDRx
+\res export D_INTFR RCC RC_AHBPCENR
+
+: dma1.clken ( -- ) 1 RCC RC_AHBPCENR + bis! ;
+: dma1.clkdis ( -- ) 1 RCC RC_AHBPCENR + bic! ;
+
+\ DMA1 D_CFGRx 3 d.ch + : addr of DMA1_CFGR3
+: d.ch ( reg ch -- u ) 1- 20 * + ;
+
+: d.en ( CFGR -- ) 1 swap bis! ; \ eg. DMA1 D_CFGRx 1 d.ch + d.en enables ch 1
+: d.dis ( CFGR -- ) 1 swap bic! ;
+: d.psz ( CFGR sz -- ) \ eg. DMA1 D_CFGRx 2 d.ch + 1 d.psz for 16-bit peripheral data size for ch 2
+  over 3 8 lshift swap bic!
+  8 lshift swap bis!
+; 
+: d.msz ( CFGR sz -- ) \ eg. DMA1 D_CFGRx 3 d.ch + 2 d.psz for 32-bit memory data size for ch 3
+  over 3 10 lshift swap bic!
+  10 lshift swap bis!
+; 
+: d.pm ( CFGR -- ) 1 4 lshift swap  bic! ; \ peripheral to memory 
+: d.mp ( CFGR -- ) 1 4 lshift swap bis! ; \ memory to peripheral
+: d.pinc ( CFGR -- ) 1 6 lshift swap bis! ; \ peripheral address increment by peripheral data size
+: d.pnoinc ( CFGR -- ) 1 6 lshift swap bic! ; \ do not increment peripheral address
+: d.minc ( CFGR -- ) 1 7 lshift swap bis! ; \ memory address increment
+: d.mnoinc ( CFGR -- ) 1 7 lshift swap bic! ; \ do not increment memory address
+: d.mmf ( CFGR -- ) 1 14 lshift swap bis! ; \ memory to memory mode
+: d.nommf ( CFGR -- ) 1 14 lshift swap bic! ; 
+
+: tst ( dst src -- )
+  dma1.clken
+  DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
+  DMA1 D_PADDRx 1 d.ch + ! \ set peripheral/source addr
+  DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
+  2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+  DMA1 D_CFGRx 1 d.ch + d.mmf \ memory to memory
+  DMA1 D_CFGRx 1 d.ch + d.pm
+  DMA1 D_CFGRx 1 d.ch + d.pinc
+  DMA1 D_CFGRx 1 d.ch + d.minc
+  DMA1 D_CFGRx 1 d.ch + 1 d.psz
+  DMA1 D_CFGRx 1 d.ch + 1 d.msz
+  DMA1 D_CFGRx 1 d.ch + d.en
+  DMA1 D_CFGRx 1 d.ch + d.mmf \ trigger transfer
+;

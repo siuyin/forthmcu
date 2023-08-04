@@ -4,6 +4,7 @@
 $40021000 equ RCC
 $04 equ RC_CFGR0
 $0c equ RC_APB2PRSTR
+$14 equ RC_AHBPCENR
 $18 equ RC_APB2PCENR
 
 $40010800 equ GPIOA
@@ -34,3 +35,12 @@ $08 equ ST_CNTL
 $0c equ ST_CNTH
 $10 equ ST_CMPLR
 $14 equ ST_CMPLH
+
+$40020000 equ DMA1
+$00 equ D_INTFR
+$04 equ D_INTFCR
+$08 equ D_CFGRx \ eg. for ch.3 : DMA1 3 dch D_CFGRx +
+$0c equ D_CNTRx \ eq. for ch.2 : DMA1 2 dch D_CNTRx +
+$10 equ D_PADDRx
+$14 equ D_MADDRx
+
