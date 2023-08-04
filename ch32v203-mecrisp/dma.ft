@@ -14,19 +14,19 @@
 : d.psz ( CFGR sz -- ) \ eg. DMA1 D_CFGRx 2 d.ch + 1 d.psz for 16-bit peripheral data size for ch 2
   over 3 8 lshift swap bic!
   8 lshift swap bis!
-; 
+;
 : d.msz ( CFGR sz -- ) \ eg. DMA1 D_CFGRx 3 d.ch + 2 d.psz for 32-bit memory data size for ch 3
   over 3 10 lshift swap bic!
   10 lshift swap bis!
-; 
-: d.pm ( CFGR -- ) 1 4 lshift swap  bic! ; \ peripheral to memory 
+;
+: d.pm ( CFGR -- ) 1 4 lshift swap  bic! ; \ peripheral to memory
 : d.mp ( CFGR -- ) 1 4 lshift swap bis! ; \ memory to peripheral
 : d.pinc ( CFGR -- ) 1 6 lshift swap bis! ; \ peripheral address increment by peripheral data size
 : d.pnoinc ( CFGR -- ) 1 6 lshift swap bic! ; \ do not increment peripheral address
 : d.minc ( CFGR -- ) 1 7 lshift swap bis! ; \ memory address increment
 : d.mnoinc ( CFGR -- ) 1 7 lshift swap bic! ; \ do not increment memory address
 : d.mmf ( CFGR -- ) 1 14 lshift swap bis! ; \ memory to memory mode
-: d.nommf ( CFGR -- ) 1 14 lshift swap bic! ; 
+: d.nommf ( CFGR -- ) 1 14 lshift swap bic! ;
 
 : tst ( dst src -- )
   dma1.clken

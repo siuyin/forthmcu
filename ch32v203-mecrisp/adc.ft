@@ -38,7 +38,7 @@
 ;
 
 \ configure adc channel to sequence number.
-\ Eg. 16 1 ad1.ch sets temperature sensor to conversion sequence 1. 
+\ Eg. 16 1 ad1.ch sets temperature sensor to conversion sequence 1.
 : ad1.ch ( ch seq# -- ) 
   dup 7 < if
     dup $1ff 1- 5 * lshift ADC1 AD_RSQR3 + bic!
@@ -71,7 +71,7 @@
   \ 1 22 lshift ADC1 AD_CTLR2 + bis! \ start conversion
   ad1.on
   begin 1 1 lshift ADC1 AD_STATR + bit@ until
-  ADC1 AD_RDATAR + @ 
+  ADC1 AD_RDATAR + @
 ;
 : ad1.ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
   4 16 ad1.t 4 17 ad1.t
@@ -81,12 +81,9 @@
 : ad1.tst 10 0 do ad1.st . loop ;
 
 #require dma.ft
-: ad1.dma ( addr -- ) \ addr is 4 buffer: name 
+: ad1.dma ( addr -- ) \ addr is 4 buffer: name
   ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
   4 16 ad1.t 4 17 ad1.t
   2 ad1.n ad1.ra ad1.dmaon ad1.scon
   16 1 ad1.ch 17 2 ad1.ch
-
-  
-
 ;
