@@ -30,5 +30,20 @@ $deadbeef src !
 2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
 DMA1 D_CFGRx 1 d.ch + d.mmf \ trigger transfer
 dst @ $deadbeef =
+  \ 6 memory to memory on dma ch 7
+$deafcafe src !
+7 dma1.chrst
+DMA1 D_CFGRx 7 d.ch + d.dis \ disable DMA ch 1 for ADC1
+src DMA1 D_PADDRx 7 d.ch + ! \ set peripheral/source addr
+dst DMA1 D_MADDRx 7 d.ch + ! \ set memory/dest addr
+2 DMA1 D_CNTRx 7 d.ch + ! \ 2 data transfers
+DMA1 D_CFGRx 7 d.ch + d.mmf \ memory to memory
+DMA1 D_CFGRx 7 d.ch + d.pinc
+DMA1 D_CFGRx 7 d.ch + d.minc
+DMA1 D_CFGRx 7 d.ch + 1 d.psz
+DMA1 D_CFGRx 7 d.ch + 1 d.msz
+DMA1 D_CFGRx 7 d.ch + d.en
+DMA1 D_CFGRx 7 d.ch + d.mmf \ trigger transfer
+dst @ $deafcafe =
 
 testresult
