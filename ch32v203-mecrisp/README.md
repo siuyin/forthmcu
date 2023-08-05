@@ -19,3 +19,7 @@ adc.ft: ADC1 routines.
 
 test_adc.ft: ADC1 tests.
 Shows single and scan (multiple) conversions.
+
+tst.ft: tiny test framework.
+
+srcdstvars.ft: declares src and dst variables. Used in testing.
