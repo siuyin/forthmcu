@@ -1,0 +1,10 @@
+#require dma.ft
+
+\ 1
+dma1.clken 1 RCC RC_AHBPCENR + bit@
+\ 2
+dma1.clkdis 1 RCC RC_AHBPCENR + bit@ not
+
+testresult
+
+
