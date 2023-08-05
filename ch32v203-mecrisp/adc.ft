@@ -1,6 +1,6 @@
 \res MCU: ch32v2x
 \res export RCC RC_APB2PCENR ADC1 AD_CTLR2 AD_RSQR1 AD_RSQR2 AD_RSQR3
-\res export AD_SAMPTR1 AD_SAMPTR2 AD_STATR AD_RDATAR RC_APB2PRSTR
+\res export AD_SAMPTR1 AD_SAMPTR2 AD_STATR AD_RDATAR RC_APB2PRSTR AD_CTLR1
 
 \ ADC clock shall not exceed 14MHz.
 : adc.pre ( u -- ) $f 14 lshift RCC RC_CFGR0 + bic!
@@ -34,6 +34,7 @@
 ;
 
 : ad1.n ( u -- ) \ number of conversions
+  $f 20 lshift ADC1 AD_RSQR1 + bic!
   20 lshift ADC1 AD_RSQR1 + bis!
 ;
 
@@ -81,9 +82,25 @@
 : ad1.tst 10 0 do ad1.st . loop ;
 
 #require dma.ft
-: ad1.dma ( addr -- ) \ addr is 4 buffer: name
+
+: ad1.dmacnf ( dst -- )
+  dma1.clken
+  DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
+  ADC1 AD_RDATAR + DMA1 D_PADDRx 1 d.ch + ! \ set source to adc1 data register
+  DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
+  2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+  DMA1 D_CFGRx 1 d.ch + d.pm
+  DMA1 D_CFGRx 1 d.ch + d.cb
+  DMA1 D_CFGRx 1 d.ch + d.pnoinc
+  DMA1 D_CFGRx 1 d.ch + d.minc
+  DMA1 D_CFGRx 1 d.ch + 1 d.psz
+  DMA1 D_CFGRx 1 d.ch + 1 d.msz
+  DMA1 D_CFGRx 1 d.ch + d.en
+;
+
+: ad1.dma ( -- ) \ addr is 4 buffer: name
   ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
   4 16 ad1.t 4 17 ad1.t
-  2 ad1.n ad1.ra ad1.dmaon ad1.scon
   16 1 ad1.ch 17 2 ad1.ch
+  2 ad1.n ad1.ra ad1.dmaon ad1.scon
 ;

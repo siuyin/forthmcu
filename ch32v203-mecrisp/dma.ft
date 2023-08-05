@@ -9,8 +9,17 @@
 \ DMA1 D_CFGRx 3 d.ch + : addr of DMA1_CFGR3
 : d.ch ( reg ch -- u ) 1- 20 * + ;
 
+: dma1.chrst ( u -- )
+  dup D_CFGRx swap d.ch DMA1 + 0 swap !
+  dup D_CNTRx swap d.ch DMA1 + 0 swap !
+  dup D_PADDRx swap d.ch DMA1 + 0 swap !
+  D_MADDRx swap d.ch DMA1 + 0 swap !
+;
+
 : d.en ( CFGR -- ) 1 swap bis! ; \ eg. DMA1 D_CFGRx 1 d.ch + d.en enables ch 1
 : d.dis ( CFGR -- ) 1 swap bic! ;
+: d.cb ( CFGR -- ) 1 5 lshift swap bis! ; \ circular buffer
+: d.nocb ( CFGR -- ) 1 5 lshift swap bic! ;
 : d.psz ( CFGR sz -- ) \ eg. DMA1 D_CFGRx 2 d.ch + 1 d.psz for 16-bit peripheral data size for ch 2
   over 3 8 lshift swap bic!
   8 lshift swap bis!
