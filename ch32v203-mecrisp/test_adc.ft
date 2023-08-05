@@ -1,0 +1,42 @@
+#require adc.ft
+#require dma.ft
+#require srcdstvars.ft
+
+  \ 1 single conversion of voltage ref
+ad1.en ad1.on ad1.tson ad1.cal
+4 17 ad1.t 17 1 ad1.ch 1 ad1.n
+ad1.on ad1.dat src !
+src @ 1460 >= src @ 1466 <= and
+  \ 2 single conversion of temperature sensor
+ad1.en ad1.on ad1.tson ad1.cal
+4 16 ad1.t 16 1 ad1.ch 1 ad1.n
+ad1.on ad1.dat src !
+src @ 1690 >= src @ 1710 <= and
+  \ 3 dma scan conversion of temp sensor and vref
+dma1.clken 1 dma1.chrst
+DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
+ADC1 AD_RDATAR + DMA1 D_PADDRx 1 d.ch + ! \ set source to adc1 data register
+dst DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
+2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+DMA1 D_CFGRx 1 d.ch + d.pm
+DMA1 D_CFGRx 1 d.ch + d.cb
+DMA1 D_CFGRx 1 d.ch + d.pnoinc
+DMA1 D_CFGRx 1 d.ch + d.minc
+DMA1 D_CFGRx 1 d.ch + 1 d.psz
+DMA1 D_CFGRx 1 d.ch + 1 d.msz
+DMA1 D_CFGRx 1 d.ch + d.en
+
+ad1.en ad1.on ad1.tson ad1.cal
+4 16 ad1.t 4 17 ad1.t
+16 1 ad1.ch 17 2 ad1.ch 1 ad1.n
+ad1.scon ad1.dmaon ad1.on
+dst h@ 1690 >= dst h@ 1710 <= and \ temperature sensor
+dst 2 + h@ 1460 >= dst 2 + h@ 1466 <= and \ voltage ref
+and
+  \ 4 retrigger dma scan conversion of temp sensor and vref
+0 dst ! ad1.on
+dst h@ 1690 >= dst 2 + h@ 1710 <= and \ temperature sensor
+dst 2 + h@ 1460 >= dst 2 + h@ 1466 <= and \ voltage ref
+and
+
+testresult

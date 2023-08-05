@@ -7,12 +7,12 @@
   14 lshift RCC RC_CFGR0 + bis!
 ; \ adc prescaler 00: PCLK2 divided by 2, 11: PCLK2 divided by 8.
 : ad1.en ( -- )
-  3 adc.pre \ adc1 /2 prescaler
+  3 adc.pre
   1 9 lshift RCC RC_APB2PCENR + bis! \ enable clock to adc1
   1 9 lshift RCC RC_APB2PRSTR + bis! \ reset adc1
   1 9 lshift RCC RC_APB2PRSTR + bic! \ reset adc1
 ;
-: ad1.de ( -- ) 1 9 lshift RCC RC_APB2PCENR + bic! ;
+: ad1.dis ( -- ) 1 9 lshift RCC RC_APB2PCENR + bic! ;
 : ad1.on ( -- ) 1 ADC1 AD_CTLR2 + bis! ;
 : ad1.off ( -- ) 1 ADC1 AD_CTLR2 + bic! ;
 : ad1.tson ( -- ) 1 23 lshift ADC1 AD_CTLR2 + bis! ;
@@ -68,39 +68,7 @@
 : ad1.la ( -- ) 1 11 lshift ADC1 AD_CTLR2 bis! ; \ conversion result left aligned
 : ad1.ra ( -- ) 1 11 lshift ADC1 AD_CTLR2 bic! ; \ conversion result right aligned
 
-: ad1.st
-  \ 1 22 lshift ADC1 AD_CTLR2 + bis! \ start conversion
-  ad1.on
+: ad1.dat
   begin 1 1 lshift ADC1 AD_STATR + bit@ until
   ADC1 AD_RDATAR + @
-;
-: ad1.ini ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
-  4 16 ad1.t 4 17 ad1.t
-  1 ad1.n ad1.ra ad1.scoff
-  16 1 ad1.ch 17 2 ad1.ch
-;
-: ad1.tst 10 0 do ad1.st . loop ;
-
-#require dma.ft
-
-: ad1.dmacnf ( dst -- )
-  dma1.clken
-  DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
-  ADC1 AD_RDATAR + DMA1 D_PADDRx 1 d.ch + ! \ set source to adc1 data register
-  DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
-  2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
-  DMA1 D_CFGRx 1 d.ch + d.pm
-  DMA1 D_CFGRx 1 d.ch + d.cb
-  DMA1 D_CFGRx 1 d.ch + d.pnoinc
-  DMA1 D_CFGRx 1 d.ch + d.minc
-  DMA1 D_CFGRx 1 d.ch + 1 d.psz
-  DMA1 D_CFGRx 1 d.ch + 1 d.msz
-  DMA1 D_CFGRx 1 d.ch + d.en
-;
-
-: ad1.dma ( -- ) \ addr is 4 buffer: name
-  ad1.en ad1.on ad1.tson ad1.etrg ad1.cal
-  4 16 ad1.t 4 17 ad1.t
-  16 1 ad1.ch 17 2 ad1.ch
-  2 ad1.n ad1.ra ad1.dmaon ad1.scon
 ;
