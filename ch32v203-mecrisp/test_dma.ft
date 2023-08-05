@@ -1,10 +1,34 @@
 #require dma.ft
+#require srcdstvars.ft
 
-\ 1
+  \ 1
 dma1.clken 1 RCC RC_AHBPCENR + bit@
-\ 2
+  \ 2
 dma1.clkdis 1 RCC RC_AHBPCENR + bit@ not
+  \ 3 reset
+dma1.clken
+DMA1 D_CFGRx 1 d.ch + d.en
+1 dma1.chrst
+DMA1 D_CFGRx 1 d.ch + @ 0=
+  \ 4 memory to memory
+$deafcafe src !
+1 dma1.chrst
+DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
+src DMA1 D_PADDRx 1 d.ch + ! \ set peripheral/source addr
+dst DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
+2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+DMA1 D_CFGRx 1 d.ch + d.mmf \ memory to memory
+DMA1 D_CFGRx 1 d.ch + d.pinc
+DMA1 D_CFGRx 1 d.ch + d.minc
+DMA1 D_CFGRx 1 d.ch + 1 d.psz
+DMA1 D_CFGRx 1 d.ch + 1 d.msz
+DMA1 D_CFGRx 1 d.ch + d.en
+DMA1 D_CFGRx 1 d.ch + d.mmf \ trigger transfer
+dst @ $deafcafe =
+  \ 5 retrigger memory to memory transfer
+$deadbeef src !
+2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+DMA1 D_CFGRx 1 d.ch + d.mmf \ trigger transfer
+dst @ $deadbeef =
 
 testresult
-
-
