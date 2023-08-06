@@ -23,3 +23,7 @@ Shows single and scan (multiple) conversions.
 tst.ft: tiny test framework.
 
 srcdstvars.ft: declares src and dst variables. Used in testing.
+
+tm.ft: timer routines.
+
+test_tm.ft: timer tests.
