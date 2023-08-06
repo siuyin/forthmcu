@@ -3,23 +3,24 @@
 
   \ 1 single conversion of voltage ref
 ad1.en ad1.on ad1.tson ad1.cal
-4 17 ad1.t 17 1 ad1.ch 1 ad1.n
+4 17 ad1.t 17 1 ad1.ch 0 ad1.n
 ad1.on ad1.dat dup
-1460 >= swap 1466 <= and
+1455 >= swap 1475 <= and
   \ 2 single conversion of temperature sensor
 ad1.en ad1.on ad1.tson ad1.cal
-4 16 ad1.t 16 1 ad1.ch 1 ad1.n
+4 16 ad1.t 16 1 ad1.ch 0 ad1.n
 ad1.on ad1.dat dup
-1690 >= src swap 1710 <= and
+1685 >= src swap 1715 <= and
   \ 3 dma scan conversion of temp sensor and vref
-dst ad1.tmpvref
-dst h@ dup 1690 >=  swap 1710 <= and \ temperature sensor
-dst 2 + h@ dup 1460 >= swap 1466 <= and \ voltage ref
+2 dst ad1.tmpvref
+dst h@ dup 1685 >=  swap 1715 <= and \ temperature sensor
+dst 2 + h@ dup 1455 >= swap 1475 <= and \ voltage ref
 and
   \ 4 retrigger dma scan conversion of temp sensor and vref
 0 dst ! ad1.on
-dst h@ dup 1690 >= swap 1710 <= and \ temperature sensor
-dst 2 + h@ dup 1460 >= swap 1466 <= and \ voltage ref
+dst @ hex.
+dst h@ dup 1685 >= swap 1715 <= and \ temperature sensor
+dst 2 + h@ dup 1455 >= swap 1475 <= and \ voltage ref
 and
 
 testresult

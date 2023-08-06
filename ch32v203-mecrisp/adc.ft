@@ -25,6 +25,8 @@
 : ad1.dmaoff ( -- ) 1 8 lshift ADC1 AD_CTLR2 + bic! ;
 : ad1.scon ( -- ) 1 8 lshift ADC1 AD_CTLR1 + bis! ;
 : ad1.scoff ( -- ) 1 8 lshift ADC1 AD_CTLR1 + bic! ;
+: ad1.conton ( -- ) 1 1 lshift ADC1 AD_CTLR2 + bis! ;
+: ad1.contoff ( -- ) 1 1 lshift ADC1 AD_CTLR2 + bic! ;
 
 : ad1.cal ( -- )
   1000 0 do nop loop
@@ -74,12 +76,12 @@
 ;
 
 #require dma.ft
-: ad1.tmpvref ( addr -- )
+: ad1.tmpvref ( u addr -- )
 dma1.clken 1 dma1.chrst
 DMA1 D_CFGRx 1 d.ch + d.dis \ disable DMA ch 1 for ADC1
 ADC1 AD_RDATAR + DMA1 D_PADDRx 1 d.ch + ! \ set source to adc1 data register
 DMA1 D_MADDRx 1 d.ch + ! \ set memory/dest addr
-2 DMA1 D_CNTRx 1 d.ch + ! \ 2 data transfers
+DMA1 D_CNTRx 1 d.ch + ! \ u-1 data transfers
 DMA1 D_CFGRx 1 d.ch + d.pm
 DMA1 D_CFGRx 1 d.ch + d.cb
 DMA1 D_CFGRx 1 d.ch + d.pnoinc
