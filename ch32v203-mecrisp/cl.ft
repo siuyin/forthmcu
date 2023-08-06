@@ -51,20 +51,19 @@
 : hsi rc.pd 0 rc.p2psc hsi.pre rc.hs $45 u1.er ;
 : hse rc.pd 0 rc.p2psc rc.ee rc.xs $d0 u1.er ;
 
-: 144i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $4e2 u1.er rc.pe rc.ps ;
-: 144ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $271 u1.er rc.pe rc.ps ;
+: 144i ( -- ) hsi rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $4e2 u1.er rc.pe rc.ps ;
+: 144ip2 ( -- ) hsi rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $271 u1.er rc.pe rc.ps ;
+: 120i ( -- ) hsi rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $412 u1.er rc.pe rc.ps ;
+: 120ip2 ( -- ) hsi rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $209 u1.er rc.pe rc.ps ;
+: 96i ( -- ) hsi rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $341 u1.er rc.pe rc.ps ;
+: 96ip2 ( -- ) hsi rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 48i ( -- ) hsi rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 16i ( -- ) hsi rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 2 rc.mul $8b u1.er rc.pe rc.ps ;
 
-: 120i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $412 u1.er rc.pe rc.ps ;
-: 120ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $209 u1.er rc.pe rc.ps ;
-: 96i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $341 u1.er rc.pe rc.ps ;
-: 96ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
-: 48i ( -- ) rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
-: 16i ( -- ) rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 2 rc.mul $8b u1.er rc.pe rc.ps ;
-
-: 144e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 4 rc.mul $4e2 u1.er rc.pe rc.ps ;
-: 144ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 4 rc.mul $271 u1.er rc.pe rc.ps ;
-: 120e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 3 rc.mul $412 u1.er rc.pe rc.ps ;
-: 120ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 3 rc.mul $209 u1.er rc.pe rc.ps ;
-: 96e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 2 rc.mul $341 u1.er rc.pe rc.ps ;
-: 96ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 2 rc.mul $1a1 u1.er rc.pe rc.ps ;
-: 48e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 0 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 144e ( -- ) hsi rc.pd 0 rc.p2psc rc.xs rc.es 4 rc.mul $4e2 u1.er rc.pe rc.ps ;
+: 144ep2 ( -- ) hsi rc.pd 4 rc.p2psc rc.xs rc.es 4 rc.mul $271 u1.er rc.pe rc.ps ;
+: 120e ( -- ) hsi rc.pd 0 rc.p2psc rc.xs rc.es 3 rc.mul $412 u1.er rc.pe rc.ps ;
+: 120ep2 ( -- ) hsi rc.pd 4 rc.p2psc rc.xs rc.es 3 rc.mul $209 u1.er rc.pe rc.ps ;
+: 96e ( -- ) hsi rc.pd 0 rc.p2psc rc.xs rc.es 2 rc.mul $341 u1.er rc.pe rc.ps ;
+: 96ep2 ( -- ) hsi rc.pd 4 rc.p2psc rc.xs rc.es 2 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 48e ( -- ) hsi rc.pd 0 rc.p2psc rc.xs rc.es 0 rc.mul $1a1 u1.er rc.pe rc.ps ;
