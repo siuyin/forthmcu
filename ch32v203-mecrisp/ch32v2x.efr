@@ -59,6 +59,7 @@ $34 equ T_CH1CVR
 $38 equ T_CH2CVR
 $3c equ T_CH3CVR
 $40 equ T_CH4CVR
+$44 equ T_BDTR
 
 $40023800 equ ETN
 $00 equ ET_CTR

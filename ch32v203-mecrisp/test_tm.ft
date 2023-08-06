@@ -1,8 +1,12 @@
 #require tm.ft
 #require tst.ft
 
-144ep2
-tim1.clken
-36000 t1.psc t1.en
+tim1.ch1en
+48i tim1.clken 48000 t1.psc t1.dis 
+500 t1.atrlr t1.ug
+
+1 t1.cc1e 
+6 t1.oc1m 250 t1.ch1cvr 1 t1.moe
+t1.en
 
 TIM1 T_CNT + @ u.
