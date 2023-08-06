@@ -1,0 +1,8 @@
+#require tm.ft
+#require tst.ft
+
+144ep2
+tim1.clken
+36000 t1.psc t1.en
+
+TIM1 T_CNT + @ u.

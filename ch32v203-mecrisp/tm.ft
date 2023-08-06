@@ -1,0 +1,18 @@
+\ tm.ft timer routines
+
+\res MCU: ch32v2x
+\res export RCC RC_APB2PCENR RC_APB2PRSTR TIM1 T_CTLR1
+\res export T_PSC T_SWEVGR T_CNT
+
+: tim1.clken ( -- )
+  1 11 lshift RCC RC_APB2PCENR + bis!
+  1 11 lshift RCC RC_APB2PRSTR + bis!
+  1 11 lshift RCC RC_APB2PRSTR + bic!
+;
+: tim1.clkdis ( -- ) 1 11 lshift RCC RC_APB2PCENR + bic! ;
+
+
+: t1.en ( -- ) 1 TIM1 T_CTLR1 + bis! ;
+: t1.dis ( -- ) 1 TIM1 T_CTLR1 + bic! ;
+: t1.ug ( -- ) 1 TIM1 T_SWEVGR + bis! ;
+: t1.psc ( u -- ) 1- TIM1 T_PSC + !  t1.ug ; \ enter 8000 to divide TIM1CLK by 8000

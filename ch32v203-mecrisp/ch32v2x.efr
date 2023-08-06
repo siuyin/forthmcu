@@ -44,3 +44,21 @@ $0c equ D_CNTRx \ eq. for ch.2 : DMA1 2 dch D_CNTRx +
 $10 equ D_PADDRx
 $14 equ D_MADDRx
 
+$40012C00 equ TIM1
+$00 equ T_CTLR1
+$04 equ T_CTLR2
+$08 equ T_SMCFGR
+$14 equ T_SWEVGR
+$18 equ T_CHCTLR1
+$1c equ T_CHCTLR2
+$20 equ T_CCER
+$24 equ T_CNT
+$28 equ T_PSC
+$2c equ T_ATRLR
+$34 equ T_CH1CVR
+$38 equ T_CH2CVR
+$3c equ T_CH3CVR
+$40 equ T_CH4CVR
+
+$40023800 equ ETN
+$00 equ ET_CTR

@@ -4,7 +4,7 @@
 #require led.ft
 
 \res MCU: ch32v2x
-\res export RCC RC_CFGR0
+\res export RCC RC_CFGR0 ETN ET_CTR
 
 : rc.ee ( -- ) 1 16 lshift RCC bis! ; \ hse on
 : rc.pe ( -- ) 1 24 lshift RCC bis! ; \ pll on
@@ -28,22 +28,43 @@
 : rc.hs ( -- ) 3 RCC RC_CFGR0 + bic! ; \ select hsi as the system clock
 : rc.es ( -- ) rc.ee 1 16 lshift RCC RC_CFGR0 + bis! ; \ select hse to drive PLL
 
-
-
-: hsi rc.hs $45 u1.er rc.pd ;
-: hse rc.ee rc.xs $d0 u1.er rc.pd ;
-
-: rc.nx ( u -- ) hsi hse rc.pd rc.es rc.mul rc.pe rc.ps \ mul x HSE
-  u1.er
-  5bl
+: rc.p1psc ( u -- )
+  7 8 lshift RCC RC_CFGR0 + bic!
+  8 lshift RCC RC_CFGR0 + bis!
 ;
-: rc.ni ( u -- ) hsi rc.pd rc.hs rc.mul rc.pe rc.ps \ mul x HSI/2
-  u1.er
-  5bl
+: rc.p2psc ( u -- )
+  7 11 lshift RCC RC_CFGR0 + bic!
+  11 lshift RCC RC_CFGR0 + bis!
 ;
-: 16i $8b 2 rc.ni ;
-: 24i $d0 4 rc.ni ;
-: 48i $1a1 10 rc.ni ;
-: 72i $271 15 rc.ni ;
-: 72e $271 1 rc.nx ;
-: 96e $341 2 rc.nx ;
+: rc.upsc ( u -- )
+  3 22 lshift RCC RC_CFGR0 + bic!
+  22 lshift RCC RC_CFGR0 + bis!
+;
+: rc.hpsc ( u -- )
+  $f 4 lshift RCC RC_CFGR0 + bic!
+  4 lshift RCC RC_CFGR0 + bis!
+;
+
+: hsi.nopre ( -- ) 1 4 lshift ETN ET_CTR + bis! ;
+: hsi.pre ( u -- ) 1 4 lshift ETN ET_CTR + bic! ; 
+: rc.is ( -- ) 1 16 lshift RCC RC_CFGR0 + bic! ;
+: hsi rc.pd 0 rc.p2psc hsi.pre rc.hs $45 u1.er ;
+: hse rc.pd 0 rc.p2psc rc.ee rc.xs $d0 u1.er ;
+
+: 144i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $4e2 u1.er rc.pe rc.ps ;
+: 144ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $f rc.mul $271 u1.er rc.pe rc.ps ;
+
+: 120i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $412 u1.er rc.pe rc.ps ;
+: 120ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is $d rc.mul $209 u1.er rc.pe rc.ps ;
+: 96i ( -- ) rc.pd 0 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $341 u1.er rc.pe rc.ps ;
+: 96ip2 ( -- ) rc.pd 4 rc.p2psc hsi.nopre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 48i ( -- ) rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 10 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 16i ( -- ) rc.pd 0 rc.p2psc hsi.pre rc.hs rc.is 2 rc.mul $8b u1.er rc.pe rc.ps ;
+
+: 144e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 4 rc.mul $4e2 u1.er rc.pe rc.ps ;
+: 144ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 4 rc.mul $271 u1.er rc.pe rc.ps ;
+: 120e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 3 rc.mul $412 u1.er rc.pe rc.ps ;
+: 120ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 3 rc.mul $209 u1.er rc.pe rc.ps ;
+: 96e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 2 rc.mul $341 u1.er rc.pe rc.ps ;
+: 96ep2 ( -- ) rc.pd 4 rc.p2psc rc.xs rc.es 2 rc.mul $1a1 u1.er rc.pe rc.ps ;
+: 48e ( -- ) rc.pd 0 rc.p2psc rc.xs rc.es 0 rc.mul $1a1 u1.er rc.pe rc.ps ;

@@ -1,4 +1,5 @@
 #require dma.ft
+#require tst.ft
 #require srcdstvars.ft
 
   \ 1
