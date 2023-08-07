@@ -10,7 +10,14 @@ $18 equ RC_APB2PCENR
 $40010800 equ GPIOA
 $00 equ GP_CFGLR
 $04 equ GP_CFGHR
+$0c equ GP_OUTDR
 $10 equ GP_BSRH
+
+$40010000 equ AFIO
+$08 equ AF_EXTICR1
+$0c equ AF_EXTICR2
+$10 equ AF_EXTICR3
+$14 equ AF_EXTICR4
 
 $40013800 equ USART1
 $08 equ U_BRR
@@ -66,7 +73,9 @@ $00 equ ET_CTR
 
 $40010400 equ EXTI
 $0 equ EI_INTENR
-$4 equ EI_EVENR
+$04 equ EI_EVENR
+$08 equ EI_RTENR
+$0c equ EI_FTENR
 $10 equ EI_SWIEVR
 $14 equ EI_INTFR
 
@@ -75,6 +84,8 @@ $0 equ PF_ISR1
 $20 equ PF_IPR1
 $4c equ PF_GISR
 $100 equ PF_IENR1
+$104 equ PF_IENR2
 $180 equ PF_IRER1
 $200 equ PF_IPSR1
 $280 equ PF_IPRR1
+$284 equ PF_IPRR2
