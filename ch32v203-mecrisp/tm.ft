@@ -12,6 +12,7 @@
 ;
 : tim1.clkdis ( -- ) 1 11 lshift RCC RC_APB2PCENR + bic! ;
 : tim1.ch1en ( -- ) $f GPIOA GP_CFGHR + bic! 9 GPIOA GP_CFGHR + bis! ;
+: tim1.ch4ren ( -- ) $f 12 lshift GPIOA GP_CFGHR + bic! 9 lshift GPIOA GP_CFGHR + bis! ;
 
 
 : t1.en ( -- ) 1 TIM1 T_CTLR1 + bis! ;
@@ -34,3 +35,5 @@
 : t1.ch1cvr ( u -- ) TIM1 T_CH1CVR + h! ;
 : t1.atrlr ( u -- ) 1- TIM1 T_ATRLR + h! ;
 : t1.moe ( u -- ) 1 15 lshift TIM1 T_BDTR + bic! 15 lshift TIM1 T_BDTR + bis! ;
+
+: % ( u -- ) t1.ch1cvr ;
