@@ -2,7 +2,7 @@
 \res export EXTI EI_EVENR EI_INTENR EI_SWIEVR EI_INTFR
 \res export PFIC PF_IPRR1 PF_IPR1 PF_ISR1 PF_GISR PF_IENR1 PF_IENR2
 \res export PF_IPRR2 GPIOA GP_OUTDR GP_CFGHR AFIO AF_EXTICR1 EI_FTENR
-\res export EI_RTENR
+\res export EI_RTENR PF_IPR2 PF_IACTR2
 
 : ifl EXTI EI_INTFR + @ hex. ;
 
@@ -22,11 +22,13 @@
   1 1 lshift EXTI EI_INTENR + bis!
   1 23 lshift PFIC PF_IENR1 + bis!
 ;
-: hwisr ( -- ) \ FIXME actually check which interrupt was invoked
+: hwisr ( -- )
+  1 24 lshift PFIC PF_IACTR2 + bit@ if
   rcc.led.en
   led2.on
   1 15 lshift EXTI EI_INTFR + bis!
   1 24 lshift PFIC PF_IPRR2 + bis!
+  then
 ;
 : hwinit ( -- )
   rcc.led.en

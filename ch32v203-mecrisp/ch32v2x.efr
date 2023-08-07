@@ -82,6 +82,7 @@ $14 equ EI_INTFR
 $E000E000 equ PFIC
 $0 equ PF_ISR1
 $20 equ PF_IPR1
+$24 equ PF_IPR2
 $4c equ PF_GISR
 $100 equ PF_IENR1
 $104 equ PF_IENR2
@@ -89,3 +90,5 @@ $180 equ PF_IRER1
 $200 equ PF_IPSR1
 $280 equ PF_IPRR1
 $284 equ PF_IPRR2
+$300 equ PF_IACTR1
+$304 equ PF_IACTR2
