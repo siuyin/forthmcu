@@ -63,3 +63,18 @@ $44 equ T_BDTR
 
 $40023800 equ ETN
 $00 equ ET_CTR
+
+$40010400 equ EXTI
+$0 equ EI_INTENR
+$4 equ EI_EVENR
+$10 equ EI_SWIEVR
+$14 equ EI_INTFR
+
+$E000E000 equ PFIC
+$0 equ PF_ISR1
+$20 equ PF_IPR1
+$4c equ PF_GISR
+$100 equ PF_IENR1
+$180 equ PF_IRER1
+$200 equ PF_IPSR1
+$280 equ PF_IPRR1

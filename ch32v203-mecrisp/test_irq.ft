@@ -1,0 +1,29 @@
+\res MCU: ch32v2x
+\res export EXTI EI_EVENR EI_INTENR EI_SWIEVR EI_INTFR
+\res export PFIC PF_IPRR1 PF_IPR1 PF_ISR1 PF_GISR PF_IENR1
+
+: ifl EXTI EI_INTFR + @ hex. ;
+
+0 variable cnt
+: icnt ( -- )
+  cnt @ 1+ cnt !
+  led1.on
+  1 22 lshift EXTI EI_INTFR + bis!
+  1 22 lshift PFIC PF_IPRR1 + bis!
+;
+
+: swinit ( -- )
+  rcc.led.en
+  led1.off
+  \ irq-exti0 $58 !
+  ['] icnt irq-exti0 !
+  1 EXTI EI_INTENR + bis!
+  1 22 lshift PFIC PF_IENR1 + bis!
+;
+
+: swi ( -- )
+  1 EXTI EI_SWIEVR + bis!
+  cnt @ .
+;
+
+swinit
