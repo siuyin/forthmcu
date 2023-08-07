@@ -3,7 +3,7 @@
 \res MCU: ch32v2x
 \res export RCC RC_APB2PCENR RC_APB2PRSTR TIM1 T_CTLR1
 \res export T_PSC T_SWEVGR T_CNT T_CHCTLR1 T_CCER T_CH1CVR
-\res export T_ATRLR T_BDTR
+\res export T_ATRLR T_BDTR T_CHCTLR2 T_CH4CVR
 
 : tim1.clken ( -- )
   1 11 lshift RCC RC_APB2PCENR + bis!
@@ -11,14 +11,15 @@
   1 11 lshift RCC RC_APB2PRSTR + bic!
 ;
 : tim1.clkdis ( -- ) 1 11 lshift RCC RC_APB2PCENR + bic! ;
-: tim1.ch1en ( -- ) $f GPIOA GP_CFGHR + bic! 9 GPIOA GP_CFGHR + bis! ;
-: tim1.ch4ren ( -- ) $f 12 lshift GPIOA GP_CFGHR + bic! 9 lshift GPIOA GP_CFGHR + bis! ;
+: tim1.ch1en ( -- ) $f GPIOA GP_CFGHR + bic! 10 GPIOA GP_CFGHR + bis! ;
+: tim1.ch4en ( -- ) $f 12 lshift GPIOA GP_CFGHR + bic! 10 12 lshift GPIOA GP_CFGHR + bis! ;
 
 
 : t1.en ( -- ) 1 TIM1 T_CTLR1 + bis! ;
 : t1.dis ( -- ) 1 TIM1 T_CTLR1 + bic! ;
 : t1.ug ( -- ) 1 TIM1 T_SWEVGR + bis! ;
 : t1.psc ( u -- ) 1- TIM1 T_PSC + !  t1.ug ; \ enter 8000 to divide TIM1CLK by 8000
+: t1.atrlr ( u -- ) 1- TIM1 T_ATRLR + h! ;
 
 : t1.oc1m ( u -- )
   7 4 lshift  TIM1 T_CHCTLR1 + bic!
@@ -33,7 +34,22 @@
   1 TIM1 T_CCER + bis!
 ;
 : t1.ch1cvr ( u -- ) TIM1 T_CH1CVR + h! ;
-: t1.atrlr ( u -- ) 1- TIM1 T_ATRLR + h! ;
+
+
+: t1.oc4m ( u -- )
+  7 12 lshift  TIM1 T_CHCTLR2 + bic!
+  12 lshift TIM1 T_CHCTLR2 + bis!
+;
+: t1.oc4pe ( u -- )
+  1 11 lshift TIM1 T_CHCTLR2 + bic!
+  11 lshift TIM1 T_CHCTLR2 + bis!
+;
+: t1.cc4e ( u -- )
+  1 12 lshift TIM1 T_CCER + bic!
+  12 lshift TIM1 T_CCER + bis!
+;
+: t1.ch4cvr ( u -- ) TIM1 T_CH4CVR + h! ;
+
 : t1.moe ( u -- ) 1 15 lshift TIM1 T_BDTR + bic! 15 lshift TIM1 T_BDTR + bis! ;
 
-: % ( u -- ) t1.ch1cvr ;
+: % ( u -- ) dup t1.ch1cvr 100 swap - t1.ch4cvr ;

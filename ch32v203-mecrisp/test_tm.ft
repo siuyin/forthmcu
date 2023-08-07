@@ -2,8 +2,38 @@
 #require tst.ft
 
 48i tim1.clken 480 t1.psc t1.dis 
-100 t1.atrlr t1.ug tim1.ch1en
+100 t1.atrlr t1.ug tim1.ch1en tim1.ch4en
 
-1 t1.cc1e 6 t1.oc1m
-50 t1.ch1cvr
+1 t1.cc1e 6 t1.oc1m 50 t1.ch1cvr
+1 t1.cc4e 6 t1.oc4m 50 t1.ch4cvr
+
 1 t1.moe t1.en
+
+: tst st.en
+  cr ." <enter> to stop"
+  begin
+  11 0 do I 10 *  %  360  dly loop
+  11 0 do 10 I - 10 * %  360  dly loop
+  key? until key .
+;
+
+11 buffer: tbl
+1 tbl 0 + c!
+2 tbl 1 + c!
+3 tbl 2 + c!
+4 tbl 3 + c!
+6 tbl 4 + c!
+10 tbl 5 + c!
+16 tbl 6 + c!
+25 tbl 7 + c!
+40 tbl 8 + c!
+63 tbl 9 + c!
+100 tbl 10 + c!
+
+: log st.en
+  cr ." log"
+  begin
+  11 0 do I tbl + c@ t1.ch1cvr 10 I - tbl + c@ t1.ch4cvr 360 dly loop
+  11 0 do 10 I - tbl + c@ t1.ch1cvr I tbl + c@ t1.ch4cvr  360 dly loop
+  key? until key .
+;
