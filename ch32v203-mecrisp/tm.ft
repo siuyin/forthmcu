@@ -30,8 +30,8 @@
   3 lshift TIM1 T_CHCTLR1 + bis!
 ;
 : t1.cc1e ( u -- )
-  1 TIM1 T_CCER + bic!
-  1 TIM1 T_CCER + bis!
+  1 0 lshift TIM1 T_CCER + bic!
+  0 lshift TIM1 T_CCER + bis!
 ;
 : t1.ch1cvr ( u -- ) TIM1 T_CH1CVR + h! ;
 

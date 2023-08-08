@@ -37,3 +37,10 @@
   11 0 do 10 I - tbl + c@ t1.ch1cvr I tbl + c@ t1.ch4cvr  360 dly loop
   key? until key .
 ;
+
+  \ 1 test if CNT is running/non-zero
+TIM1 T_CNT + @ 0<>
+  \ 2 test if prescaler is  480-1
+TIM1 T_PSC + @ 480 1- =
+
+testresult
