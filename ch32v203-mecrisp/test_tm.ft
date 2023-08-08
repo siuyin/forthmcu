@@ -42,5 +42,7 @@
 TIM1 T_CNT + @ 0<>
   \ 2 test if prescaler is  480-1
 TIM1 T_PSC + @ 480 1- =
+  \ 3 check if compare reg has value 50
+TIM1 T_CH1CVR + @ 50 =
 
 testresult

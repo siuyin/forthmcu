@@ -1,3 +1,5 @@
+#require tst.ft
+
 \res MCU: ch32v2x
 \res export EXTI EI_EVENR EI_INTENR EI_SWIEVR EI_INTFR
 \res export PFIC PF_IPRR1 PF_IPR1 PF_ISR1 PF_GISR PF_IENR1 PF_IENR2
@@ -17,7 +19,6 @@
 : swinit ( -- )
   rcc.led.en
   led1.off
-  \ ['] icnt irq-exti0 !
   ['] icnt irq-exti1 !
   1 1 lshift EXTI EI_INTENR + bis!
   1 23 lshift PFIC PF_IENR1 + bis!
@@ -51,3 +52,14 @@
 
 swinit
 hwinit \ trigger with button push on PA15
+
+  \ 1 check swinit points to the correct interrupt request routine
+irq-exti1 @ ' icnt =
+  \ 2 check hwint has irq-collection point to button handler
+irq-collection @ ' hwisr =
+  \ 3 external interrupt line 1 should be enabled for software interrupt
+1 1 lshift EXTI EI_INTENR + bit@
+  \ 4 external interrupt line 15 shold be enabled for hardware interrupt
+1 15 lshift EXTI EI_INTENR + bit@
+
+testresult
