@@ -1,7 +1,9 @@
 \ test_en.ft encoder test routines
 
 \res MCU: ch32v2x
-\res export RCC RC_APB2PCENR GPIOB GP_INDR GP_OUTDR GP_CFGLR
+\res export RCC RC_APB2PCENR GPIOB GP_INDR GP_OUTDR GP_CFGLR T_CCER
+\res export TIM4 T_SMCFGR RC_APB1PRSTR T_CTLR1 T_CHCTLR1 T_CH1CVR T_CNT
+\res export T_SWEVGR T_PSC RC_APB1PCENR T_CH2CVR
 
 : pb.en ( -- )
   1 3 lshift RCC RC_APB2PCENR + bis!
@@ -16,13 +18,37 @@
   $3 6 lshift GPIOB GP_OUTDR + bis!
 ;
 
-: led.mon ( -- ) \ show encoder state
-  rcc.led.en
-  pb.en pb67.in
+: enc.cfg ( -- )
+  1 2 lshift RCC RC_APB1PCENR + bis! \ enable tim4
+  1 2 lshift RCC RC_APB1PRSTR + bis! \ reset tim4
+  1 2 lshift RCC RC_APB1PRSTR + bic!
+  1 TIM4 T_CTLR1 + bic! \ disable counter
+  7 TIM4 T_SMCFGR + bic! \ set encoder mode
+  3 TIM4 T_SMCFGR + bis!
+  $f 12 lshift TIM4 T_CHCTLR1 + bis! \ filter input 2
+  $f 4 lshift TIM4 T_CHCTLR1 + bis! \ filter input 1
+  2 8 lshift TIM4 T_CHCTLR1 + bis! \ TI2 -> input capture 2
+  1 TIM4 T_CHCTLR1 + bis! \ TI1 -> input capture 1
+  1 0 lshift TIM4 T_CCER + bis! \ enable capture 1
+  1 4 lshift TIM4 T_CCER + bis! \ enable capture 2
+  1 TIM4 T_CTLR1 + bis! \ enable counter
+  4 1- TIM4 T_PSC + !
+  1 TIM4 T_SWEVGR + bis! \ issue an update event to init counter
+;
+
+0 variable prev
+: cnt ( -- )
+TIM4 T_CNT + h@ .
+\ TIM4 T_CH1CVR + h@ .
+\ TIM4 T_CH2CVR + h@ .
+;
+
+: mon ( -- ) \ show encoder state
+  pb.en pb67.in enc.cfg
+  st.en
   begin
-    1 6 lshift GPIOB GP_INDR + hbit@ if led1.off else led1.on then
-    1 7 lshift GPIOB GP_INDR + hbit@ if led2.off else led2.on then
+    cnt 500 dly
   key? until
 ;
 
-led.mon
+mon

@@ -19,9 +19,13 @@ dst 2 + h@ dup 1455 >= swap 1485 <= and \ voltage ref
 and
   \ 4 retrigger dma scan conversion of temp sensor and vref
 0 dst ! ad1.on
-dst @ hex.
 dst h@ dup 1685 >= swap 1725 <= and \ temperature sensor
 dst 2 + h@ dup 1455 >= swap 1485 <= and \ voltage ref
 and
+  \ 5 single conversion on PB0/ADC_IN8. Potentiometer set at mid-level.
+ad1.en ad1.on ad1.tson ad1.cal
+4 8 ad1.t 8 1 ad1.ch 0 ad1.n
+ad1.on ad1.dat dup . dup
+1536 >= swap 2560 <= and
 
 testresult
