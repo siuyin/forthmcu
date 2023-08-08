@@ -1,0 +1,28 @@
+\ test_en.ft encoder test routines
+
+\res MCU: ch32v2x
+\res export RCC RC_APB2PCENR GPIOB GP_INDR GP_OUTDR GP_CFGLR
+
+: pb.en ( -- )
+  1 3 lshift RCC RC_APB2PCENR + bis!
+  3 8 lshift GPIOB GP_CFGLR + bic! \ set PB2/BOOT1 input pull-down
+  8 8 lshift GPIOB GP_CFGLR + bis!
+  1 2 lshift GPIOB GP_OUTDR + bic!
+;
+
+: pb67.in ( -- ) \ pb6,7: in, pull-up
+  $ff 24 lshift GPIOB GP_CFGLR + bic!
+  $88 24 lshift GPIOB GP_CFGLR + bis!
+  $3 6 lshift GPIOB GP_OUTDR + bis!
+;
+
+: led.mon ( -- ) \ show encoder state
+  rcc.led.en
+  pb.en pb67.in
+  begin
+    1 6 lshift GPIOB GP_INDR + hbit@ if led1.off else led1.on then
+    1 7 lshift GPIOB GP_INDR + hbit@ if led2.off else led2.on then
+  key? until
+;
+
+led.mon
