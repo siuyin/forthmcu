@@ -1,0 +1,28 @@
+#require i2c.ft
+#require tst.ft
+
+: i2.st ( -- )
+  1 I2C1 I2_CTLR1 + bis! \ enable peripheral
+  $02 1 lshift I2C1 I2_OADDR1 + bis! 
+  1 8 lshift I2C1 I2_CTLR1 + bis! \ start
+  begin 1 I2C1 I2_STAR1 + hbit@ until
+  $5a 1 lshift 1 or I2C1 I2_DATAR + c!
+;
+
+  \ 1 12c1 should be enabled on APB1
+8 i2c1.en
+1 21 lshift RCC RC_APB1PCENR + bit@
+  \ 2 PB6 (SCL) and PB7 (SDA) should be outputs, open-drain
+GPIOB GP_CFGLR + @ 24 rshift $dd =
+  \ 3 assuming HSI, i2c should be clocked at 8MHz
+I2C1 I2_CTLR2 + @ $1fff and 8 =
+  \ 4 assuming 100kHz I2C, clock divisor should be 40: 8MHz/100kHz / 2
+I2C1 I2_CKCFGR + @ $fff and dup . 40 =
+  \ 5 standard mode should be selected
+1 15 lshift I2C1 I2_CKCFGR + bit@ not
+  \ 6 maximum rise time in 100kHz mode is 1000ns
+  \ Given a 8MHz clock (125ns period,T), this is 1000/125 = 8 T.
+  \ TRISE value should one more that the above: 8+1
+I2C1 I2_RTR + h@ 8 1+ =
+
+testresult

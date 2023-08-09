@@ -1,0 +1,20 @@
+\ i2c.ft i2c routines
+\res MCU: ch32v2x
+\res export RCC RC_APB1PCENR RC_APB1PRSTR GPIOB GP_CFGLR
+\res export I2C1 I2_CTLR2 I2_CTLR1 I2_CKCFGR I2_DATAR
+\res export I2_OADDR1 I2_STAR1 I2_RTR
+
+: i2c1.en ( u -- )
+  1 3 lshift RCC RC_APB2PCENR + bis! \ enable GPIOB
+  $dd 24 lshift GPIOB GP_CFGLR + bis!
+
+  1 21 lshift RCC RC_APB1PCENR + bis!
+  1 21 lshift RCC RC_APB1PRSTR + bis! \ reset
+  1 21 lshift RCC RC_APB1PRSTR + bic!
+
+  \ 1 I2C1 I2_CTLR1 + bis! \ enable peripheral
+  dup I2C1 I2_CTLR2 + bis! \ set clock speed  
+  dup 5 * I2C1 I2_CKCFGR + bis! \ set SCL frequency
+  1 * 1+ I2C1 I2_RTR + c! \ TRISE = 1us * F MHz + 1 : I2C 100kHz spec: 1000ns = 1us
+;
+
