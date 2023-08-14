@@ -1,12 +1,32 @@
 #require i2c.ft
 #require tst.ft
 
-: i2.st ( -- )
-  1 I2C1 I2_CTLR1 + bis! \ enable peripheral
-  $02 1 lshift I2C1 I2_OADDR1 + bis! 
+: stat ( u -- f )
+  I2C1 I2_STAR1 + @
+  I2C1 I2_STAR2 + @ 16 lshift or
+  $00ffffff and
+  dup and =
+;
+
+: i1.st ( -- )
+  pe.en
+  begin $20000 stat not until \ bus not busy
   1 8 lshift I2C1 I2_CTLR1 + bis! \ start
-  begin 1 I2C1 I2_STAR1 + hbit@ until
-  $5a 1 lshift 1 or I2C1 I2_DATAR + c!
+  begin $30001 stat until \ start sent
+  1 1 lshift $fffe and I2C1 I2_DATAR + !
+  begin $70082 stat until \ address sent
+  5 0 do
+    begin $80 stat not until \ tx not empty
+    i 1+ I2C1 I2_DATAR + !
+  loop
+  begin $70084 stat until
+  1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
+;
+: i2.st ( -- )
+  1 8 lshift I2C2 I2_CTLR1 + bis! \ start
+  begin 1 I2C2 I2_STAR1 + hbit@ until \ wait for SB
+  $5b 1 lshift 1 or I2C2 I2_DATAR + !
+  1 9 lshift I2C2 I2_CTLR1 + bis! \ stop
 ;
 
   \ 1 12c1 should be enabled on APB1
@@ -17,12 +37,23 @@ GPIOB GP_CFGLR + @ 24 rshift $dd =
   \ 3 assuming HSI, i2c should be clocked at 8MHz
 I2C1 I2_CTLR2 + @ $1fff and 8 =
   \ 4 assuming 100kHz I2C, clock divisor should be 40: 8MHz/100kHz / 2
-I2C1 I2_CKCFGR + @ $fff and dup . 40 =
+I2C1 I2_CKCFGR + @ $fff and 40 =
   \ 5 standard mode should be selected
 1 15 lshift I2C1 I2_CKCFGR + bit@ not
   \ 6 maximum rise time in 100kHz mode is 1000ns
   \ Given a 8MHz clock (125ns period,T), this is 1000/125 = 8 T.
   \ TRISE value should one more that the above: 8+1
 I2C1 I2_RTR + h@ 8 1+ =
+  \ 7 I2C2 should be enabled
+8 i2c2.en
+1 I2C2 I2_CTLR1 + hbit@
+  \ 8 i2c2 should be clocked
+1 22 lshift RCC RC_APB1PCENR + bit@
+  \ 9 PB10 (SCL) and PB11 (SDA) should be outputs, open-drain
+GPIOB GP_CFGHR + @ 8 rshift $ff and $dd =
+  \ 10 I2C2 address should be $5a
+I2C2 I2_OADDR1 + @ 1 rshift $7F and $5a =
+  \ 11 I2C2 peripheral should be in slave mode
+1 I2C2 I2_STAR2 + hbit@ not
 
 testresult

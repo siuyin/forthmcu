@@ -2,19 +2,42 @@
 \res MCU: ch32v2x
 \res export RCC RC_APB1PCENR RC_APB1PRSTR GPIOB GP_CFGLR
 \res export I2C1 I2_CTLR2 I2_CTLR1 I2_CKCFGR I2_DATAR
-\res export I2_OADDR1 I2_STAR1 I2_RTR
+\res export I2_OADDR1 I2_STAR1 I2_RTR I2_STAR2 I2C2 I2_OADDR2
+
+: pe.en 1 I2C1 I2_CTLR1 + bis! ;
+: pe.dis 1 I2C1 I2_CTLR1 + bic! ;
 
 : i2c1.en ( u -- )
   1 3 lshift RCC RC_APB2PCENR + bis! \ enable GPIOB
+  $ff 24 lshift GPIOB GP_CFGLR + bic!
   $dd 24 lshift GPIOB GP_CFGLR + bis!
 
   1 21 lshift RCC RC_APB1PCENR + bis!
   1 21 lshift RCC RC_APB1PRSTR + bis! \ reset
   1 21 lshift RCC RC_APB1PRSTR + bic!
 
-  \ 1 I2C1 I2_CTLR1 + bis! \ enable peripheral
   dup I2C1 I2_CTLR2 + bis! \ set clock speed  
   dup 5 * I2C1 I2_CKCFGR + bis! \ set SCL frequency
   1 * 1+ I2C1 I2_RTR + c! \ TRISE = 1us * F MHz + 1 : I2C 100kHz spec: 1000ns = 1us
+  \ 1 10 lshift I2C1 I2_CTLR1 + bis! \ auto ack
+  $5b 1 lshift 1 14 lshift or I2C1 I2_OADDR1 + bis!
+  pe.en
+;
+: i2c2.en ( u -- )
+  1 3 lshift RCC RC_APB2PCENR + bis! \ enable GPIOB
+  $ff 8 lshift GPIOB GP_CFGHR + bic!
+  $dd 8 lshift GPIOB GP_CFGHR + bis!
+
+  1 22 lshift RCC RC_APB1PCENR + bis!
+  1 22 lshift RCC RC_APB1PRSTR + bis! \ reset
+  1 22 lshift RCC RC_APB1PRSTR + bic!
+
+  dup I2C2 I2_CTLR2 + bis! \ set clock speed  
+  dup 5 * I2C2 I2_CKCFGR + bis! \ set SCL frequency
+  1 * 1+ I2C2 I2_RTR + c! \ TRISE = 1us * F MHz + 1 : I2C 100kHz spec: 1000ns = 1us
+  1 10 lshift I2C2 I2_CTLR1 + bis! \ auto ack
+
+  $5a 1 lshift 1 14 lshift or I2C2 I2_OADDR1 + bis!
+  1 I2C2 I2_CTLR1 + bis! \ en
 ;
 
