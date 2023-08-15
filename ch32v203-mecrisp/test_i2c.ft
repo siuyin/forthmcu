@@ -12,47 +12,26 @@
   I2C1 I2_STAR2 + @ 16 lshift or hex.
 ;
 
-1 buffer: cnt
-1 cnt c!
-
-: t1 ( -- )
+\ tst works with an I2C receiver, a separate device,
+\ that has address 0x01 and receives 6 bytes before
+\ entering an infinite busy loop.
+\ See: https://github.com/openwch/ch32v003/blob/503b1dc3440a89e67481f147964165399b8d7ad0/EVT/EXAM/I2C/I2C_7bit_Mode/User/main.c#L140
+: tst ( -- )
   pe.en
   begin $20000 stat not until \ bus not busy
   1 8 lshift I2C1 I2_CTLR1 + bis! \ start
   begin $30001 stat until \ start sent
   1 1 lshift $fffe and I2C1 I2_DATAR + c!
   begin $70082 stat until \ address sent
-  7 0 do 
+  6 0 do 
     i 1+  I2C1 I2_DATAR + c!
+    \ begin $80 stat until \ Tx empty
     begin 1 7 lshift I2C1 I2_STAR1 + bit@ until
   loop
   1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
   st
 ;
 
-: i1.st ( -- )
-  pe.en
-  begin $20000 stat not until \ bus not busy
-  1 8 lshift I2C1 I2_CTLR1 + bis! \ start
-  begin $30001 stat until \ start sent
-  1 1 lshift $fffe and I2C1 I2_DATAR + c!
-  begin $70082 stat until \ address sent
-  $a5 I2C1 I2_DATAR + c!
-  begin
-    $80 stat not if \ Tx empty
-      cnt c@ I2C1 I2_DATAR + c!
-      cnt c@ 1+ cnt c!
-    then
-  cnt c@ 5 = until
-  begin $70084 stat until
-  1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
-;
-: i2.st ( -- )
-  1 8 lshift I2C2 I2_CTLR1 + bis! \ start
-  begin 1 I2C2 I2_STAR1 + hbit@ until \ wait for SB
-  $5b 1 lshift 1 or I2C2 I2_DATAR + !
-  1 9 lshift I2C2 I2_CTLR1 + bis! \ stop
-;
 
   \ 1 12c1 should be enabled on APB1
 8 i2c1.en
@@ -83,4 +62,3 @@ I2C2 I2_OADDR1 + @ 1 rshift $7F and $5a =
 
 testresult
 
-t1
