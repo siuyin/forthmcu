@@ -7,18 +7,43 @@
   $00ffffff and
   dup and =
 ;
+: st ( -- )
+  I2C1 I2_STAR1 + @
+  I2C1 I2_STAR2 + @ 16 lshift or hex.
+;
+
+1 buffer: cnt
+1 cnt c!
+
+: t1 ( -- )
+  pe.en
+  begin $20000 stat not until \ bus not busy
+  1 8 lshift I2C1 I2_CTLR1 + bis! \ start
+  begin $30001 stat until \ start sent
+  1 1 lshift $fffe and I2C1 I2_DATAR + c!
+  begin $70082 stat until \ address sent
+  7 0 do 
+    i 1+  I2C1 I2_DATAR + c!
+    begin 1 7 lshift I2C1 I2_STAR1 + bit@ until
+  loop
+  1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
+  st
+;
 
 : i1.st ( -- )
   pe.en
   begin $20000 stat not until \ bus not busy
   1 8 lshift I2C1 I2_CTLR1 + bis! \ start
   begin $30001 stat until \ start sent
-  1 1 lshift $fffe and I2C1 I2_DATAR + !
+  1 1 lshift $fffe and I2C1 I2_DATAR + c!
   begin $70082 stat until \ address sent
-  5 0 do
-    begin $80 stat not until \ tx not empty
-    i 1+ I2C1 I2_DATAR + !
-  loop
+  $a5 I2C1 I2_DATAR + c!
+  begin
+    $80 stat not if \ Tx empty
+      cnt c@ I2C1 I2_DATAR + c!
+      cnt c@ 1+ cnt c!
+    then
+  cnt c@ 5 = until
   begin $70084 stat until
   1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
 ;
@@ -57,3 +82,5 @@ I2C2 I2_OADDR1 + @ 1 rshift $7F and $5a =
 1 I2C2 I2_STAR2 + hbit@ not
 
 testresult
+
+t1
