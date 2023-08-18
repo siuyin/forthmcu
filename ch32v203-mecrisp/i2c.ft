@@ -36,8 +36,4 @@
   dup 5 * I2C2 I2_CKCFGR + bis! \ set SCL frequency
   1 * 1+ I2C2 I2_RTR + c! \ TRISE = 1us * F MHz + 1 : I2C 100kHz spec: 1000ns = 1us
   1 10 lshift I2C2 I2_CTLR1 + bis! \ auto ack
-
-  $5a 1 lshift 1 14 lshift or I2C2 I2_OADDR1 + bis!
-  1 I2C2 I2_CTLR1 + bis! \ en
 ;
-

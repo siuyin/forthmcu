@@ -1,5 +1,6 @@
 #require i2c.ft
 #require tst.ft
+\res export PFIC PF_IENR2 PF_ISR2 PF_IPR2 PF_IACTR2 PF_IPRR2
 
 : stat ( u -- f )
   I2C1 I2_STAR1 + @
@@ -10,6 +11,10 @@
 : st ( -- )
   I2C1 I2_STAR1 + @
   I2C1 I2_STAR2 + @ 16 lshift or hex.
+;
+: st2 ( -- )
+  I2C2 I2_STAR1 + @
+  I2C2 I2_STAR2 + @ 16 lshift or hex.
 ;
 
 \ tst works with an I2C receiver, a separate device,
@@ -25,11 +30,44 @@
   begin $70082 stat until \ address sent
   6 0 do 
     i 1+  I2C1 I2_DATAR + c!
-    \ begin $80 stat until \ Tx empty
     begin 1 7 lshift I2C1 I2_STAR1 + bit@ until
   loop
   1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
   st
+;
+
+: i1 ( -- ) \ exercise I2C2 from I2C1
+  pe.dis
+  pe.en
+  begin $20000 stat not until \ bus not busy
+  1 8 lshift I2C1 I2_CTLR1 + bis! \ start
+  begin $30001 stat until \ start sent
+  1 1 lshift $fffe and I2C1 I2_DATAR + c!
+  st.en 1 dly
+  \ begin $70082 stat until \ address sent
+  1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
+  st
+;
+
+: isr ( -- )
+  rcc.led.en
+  led1.on
+  st2
+  1 17 lshift PFIC PF_IPRR2 + bis! \ reset pending interrupt
+;
+
+: pen ( -- ) \ irq pending
+  PFIC PF_IPR2 + @ hex.
+;
+
+: i2 ( -- ) \ enable I2C2
+  ['] isr irq-collection !
+  8 i2c2.en
+  1 I2C2 I2_CTLR1 + bic!
+  1 I2C2 I2_CTLR1 + bis! \ en
+  1 17 lshift PFIC PF_IENR2 + bis! \ enable irq 49 for I2C2 events
+  $2 1 lshift 1 14 lshift or I2C2 I2_OADDR1 + bis!
+  7 8 lshift I2C2 I2_CTLR2 + bis! \ enable interrupts
 ;
 
 
@@ -50,15 +88,19 @@ I2C1 I2_CKCFGR + @ $fff and 40 =
 I2C1 I2_RTR + h@ 8 1+ =
   \ 7 I2C2 should be enabled
 8 i2c2.en
+  i2
 1 I2C2 I2_CTLR1 + hbit@
   \ 8 i2c2 should be clocked
 1 22 lshift RCC RC_APB1PCENR + bit@
   \ 9 PB10 (SCL) and PB11 (SDA) should be outputs, open-drain
 GPIOB GP_CFGHR + @ 8 rshift $ff and $dd =
-  \ 10 I2C2 address should be $5a
-I2C2 I2_OADDR1 + @ 1 rshift $7F and $5a =
+  \ 10 I2C2 address should be $2
+I2C2 I2_OADDR1 + @ 1 rshift $7F and $2 =
   \ 11 I2C2 peripheral should be in slave mode
 1 I2C2 I2_STAR2 + hbit@ not
+  \ 12 I2C2 should have interrupt 49 enabled
+1 17 lshift  PFIC PF_ISR2 + bit@
+  \ 13 irq-collection should be set to address of isr
+irq-collection @ ' isr =
 
 testresult
-

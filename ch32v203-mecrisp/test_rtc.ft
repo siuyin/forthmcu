@@ -1,0 +1,61 @@
+\ test_rtc.ft -- real time clock routines
+
+\res MCU: ch32v2x
+\res export RTC RCC RC_RSTSCKR RC_BDCTLR RT_CNTL RT_CTLRH RT_CTLRL
+\res export RT_PSCRL RT_CNTH PWR_CTLR RC_APB1PCENR RT_DIVL RT_DIVH RT_PSCRH
+\res export GPIOA GP_OUTDR PFIC PF_IENR1 PF_ISR1 PF_IPRR1 PF_IPR1 PF_IACTR1
+
+#require tst.ft
+
+: lsi.on ( -- ) 1 RCC RC_RSTSCKR + bis! ;
+: rtc.en ( -- )
+  3 27 lshift RCC RC_APB1PCENR + bis! \ enable clock to power and backup domains
+  1 8 lshift PWR_CTLR bis! \ enable write access to backup power domain
+  
+  3 8 lshift RCC RC_BDCTLR + bic!
+  2 8 lshift RCC RC_BDCTLR + bis! \ LSI clocks RTC
+  1 15 lshift RCC RC_BDCTLR + bis! \ enable RTC
+
+  1 3 lshift RTC RT_CTLRL + bic! \ clear RTC reset flag
+  begin 1 3 lshift RTC RT_CTLRL + hbit@ until \ wait till RTC is synced
+  begin 1 5 lshift RTC RT_CTLRL + hbit@ until \ wail till last write is done
+  1 4 lshift RTC RT_CTLRL + bis! \ enter configuration mode
+  0 RTC RT_PSCRH + h!
+  39400 1- RTC RT_PSCRL + h! \ prescale by LSI frequency, 40kHz nominal, calibrated for my device
+  1 4 lshift RTC RT_CTLRL + bic! \ exit configuration mode
+  begin 1 5 lshift RTC RT_CTLRL + hbit@ until \ wail till last write is done
+;
+
+: led.toggle ( -- )
+  rcc.led.en
+  1 19 lshift PFIC PF_IACTR1 + bit@ if
+    1 8 lshift GPIOA GP_OUTDR + bit@ if
+      led1.off led2.on
+    else
+      led1.on led2.off
+    then
+    1 RTC RT_CTLRL + hbic! \ clear interrupt
+  then 
+;
+
+: int.init ( -- )
+  ['] led.toggle irq-collection !
+  1 RTC RT_CTLRH + bis! \ enable second tick interrupt
+  1 19 lshift PFIC PF_IENR1 + bis! \ enable RTC interrupt
+;
+
+: time ( -- u ) RTC RT_CNTL + @ RTC RT_CNTH + @ 16 lshift or ;
+
+  \ 1 LSI should be ready
+lsi.on
+1 1 lshift RCC RC_RSTSCKR + bit@
+  \ 2 RTC prescaler / auto-reloader should be initialized
+rtc.en
+RTC RT_PSCRL + @ 39400 1- =
+  \ 3 RTC interrupt should be enabled
+int.init
+1 19 lshift PFIC PF_ISR1 + bit@
+  \ 4 ISR should be set
+irq-collection @ ' led.toggle =
+
+testresult
