@@ -43,6 +43,8 @@
   $2a 1 lshift $fffe and I2C1 I2_DATAR + c!
   begin $70082 stat until \ address sent
   I2C1 I2_DATAR + c!
+  begin 1 7 lshift I2C1 I2_STAR1 + bit@ until \ Tx empty
+  1 9 lshift I2C1 I2_CTLR1 + bis! \ stop
 ;
 
 : isr ( -- )
