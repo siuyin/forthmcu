@@ -1,0 +1,34 @@
+\ led.ft controls LEDS on STM32F401RC board.
+\ The routines are written in forth.
+
+\res MCU: stm32f401
+\res export RCC GPIOC GPIOD RC_AHB1ENR GP_MODER GP_BSRR
+
+: rcc.led.en ( -- )
+  1 2 lshift 1 3 lshift or RCC RC_AHB1ENR + bis!
+  %01 GPIOC GP_MODER + bis!
+  %01 2 2 * lshift GPIOD GP_MODER + bis!
+;
+: led1.on ( -- ) 1 2 lshift GPIOD GP_BSRR + bis! 
+;
+: led1.off ( -- ) 1 2 16 + lshift GPIOD GP_BSRR + bis!
+;
+: led2.on ( -- ) 1 GPIOC GP_BSRR + bis!
+;
+: led2.off ( -- ) 1 0 16 +  lshift GPIOC GP_BSRR + bis!
+;
+
+\ Toggle line buffering with \^ on eth4com.
+: led.kb
+  rcc.led.en
+  begin
+    key dup
+    $31 = if led1.on then dup
+    $32 = if led1.off then dup
+    $33 = if led2.on then dup
+    $34 = if led2.off then dup
+    $30 =
+  until
+;
+
+
