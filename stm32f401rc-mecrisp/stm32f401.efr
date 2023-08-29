@@ -8,6 +8,8 @@ $40020400 equ GPIOB
 $40020800 equ GPIOC
 $40020C00 equ GPIOD
 $0  equ GP_MODER
+$c  equ GP_PUPDR
+$10 equ GP_IDR
 $18 equ GP_BSRR
 
 $E000E010 equ STK

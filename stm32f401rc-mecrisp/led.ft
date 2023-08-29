@@ -3,11 +3,17 @@
 
 \res MCU: stm32f401
 \res export RCC GPIOC GPIOD RC_AHB1ENR GP_MODER GP_BSRR
+\res export GPIOA GP_PUPDR GP_IDR
 
 : rcc.led.en ( -- )
   1 2 lshift 1 3 lshift or RCC RC_AHB1ENR + bis!
   %01 GPIOC GP_MODER + bis!
   %01 2 2 * lshift GPIOD GP_MODER + bis!
+;
+: rcc.btn.en ( -- )
+  1 RCC RC_AHB1ENR + bis! \ GPIOA
+  %11 GPIOA GP_PUPDR + bic!
+  %01 GPIOA GP_PUPDR + bis! \ pull-up
 ;
 : led1.on ( -- ) 1 2 lshift GPIOD GP_BSRR + bis! 
 ;
@@ -36,4 +42,11 @@
   5 0 do 
     led1.on 500 dly led1.off 500 dly
   loop
+;
+
+: btn ( -- )
+  rcc.led.en rcc.btn.en
+  begin
+    1 GPIOA GP_IDR + hbit@ if led1.off led2.on else led1.on led2.off then
+  key? until
 ;
