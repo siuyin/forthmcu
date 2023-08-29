@@ -1,0 +1,24 @@
+\ st.ft systick routines
+
+\res MCU: stm32f401
+\res export STK ST_CSR ST_RVR ST_CVR ST_CALIB
+
+: st.en ( -- )
+  0 STK ST_CVR + ! \ clear current value
+  1 STK ST_CSR + bis!
+;
+: st.dis ( -- ) 1 STK ST_CSR + bic! ;
+: st.rv ( u -- ) STK ST_RVR + ! ;
+: st.cnt ( -- u ) STK ST_CVR + @ ;
+: st.init ( -- ) \ free-run
+  $ffffff st.rv st.en
+;
+
+2000 constant ticks_per_ms
+: dly ( u -- )
+  ticks_per_ms * \ each tick is 0.5us
+  st.cnt swap - dup
+  0< if $1000000 + then
+  begin dup st.cnt >= until
+  drop
+;

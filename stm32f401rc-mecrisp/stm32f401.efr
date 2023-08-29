@@ -9,3 +9,9 @@ $40020800 equ GPIOC
 $40020C00 equ GPIOD
 $0  equ GP_MODER
 $18 equ GP_BSRR
+
+$E000E010 equ STK
+$0  equ ST_CSR
+$4  equ ST_RVR
+$8  equ ST_CVR
+$C  equ ST_CALIB
