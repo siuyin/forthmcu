@@ -11,14 +11,17 @@
 : st.rv ( u -- ) STK ST_RVR + ! ;
 : st.cnt ( -- u ) STK ST_CVR + @ ;
 : st.init ( -- ) \ free-run
-  $ffffff st.rv st.en
+  $1000000 1- st.rv st.en
 ;
 
 2000 constant ticks_per_ms
-: dly ( u -- )
-  ticks_per_ms * \ each tick is 0.5us
+: dly.tick ( dly -- u ) \ return tick count after
+  ticks_per_ms * \ each tick is 0.5us for (16MHz / 8) clock
   st.cnt swap - dup
-  0< if $1000000 + then
+  0< if $1000000 + then \ systick reload is set to ($1000000 - 1)
+;
+: dly ( u -- )
+  dly.tick
   begin dup st.cnt >= until
   drop
 ;

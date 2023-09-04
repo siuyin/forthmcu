@@ -1,0 +1,12 @@
+\ test_st.ft - systick test routines
+
+#require st.ft
+#require ../tst.ft
+
+  \ 1 systick calibration value should be 10500
+STK ST_CALIB + h@ 10500 =
+  \ 2 systick reload value should be ($100_0000 - 1) = $ff_ffff
+st.init
+STK ST_RVR + @ $1000000 1- =
+
+testresult

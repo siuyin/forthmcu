@@ -1,5 +1,10 @@
 0 variable t#
-: testresult depth t# ! t# @ 0 cr do t# @ i -  . if ." pass" else ." fail" then cr loop  ;
+: testresult
+  depth t# ! \ depth is the current stack depth
+  t# @ 0 cr do
+    t# @ i -  . if ." pass" else ." fail" then cr
+  loop
+;
 
 
 
